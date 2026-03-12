@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { authClient } from "@/lib/auth/client"
 import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
+
 
 export default function Topbar() {
 
@@ -108,7 +110,7 @@ export default function Topbar() {
                   </div>
                 </div>
 
-                <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
+                <Link href="/dashboard/explore" className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
                   <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-purple-50 text-purple-600 group-hover/item:bg-purple-100 group-hover/item:scale-105 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
                   </div>
@@ -116,9 +118,10 @@ export default function Topbar() {
                     <div className="text-sm font-medium text-gray-900">Explore Colleges</div>
                     <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Browse extensive databases</div>
                   </div>
-                </div>
+                </Link>
 
-                <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
+
+                <Link href="/dashboard/compare" className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
                   <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-amber-50 text-amber-600 group-hover/item:bg-amber-100 group-hover/item:scale-105 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                   </div>
@@ -126,7 +129,7 @@ export default function Topbar() {
                     <div className="text-sm font-medium text-gray-900">Compare</div>
                     <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Side-by-side analysis</div>
                   </div>
-                </div>
+                </Link>
 
                 <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
                   <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 group-hover/item:bg-emerald-100 group-hover/item:scale-105 transition-all">
