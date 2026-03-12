@@ -1,0 +1,43 @@
+{
+  "allCookies": [
+    {
+      "name": "ajs_anonymous_id",
+      "value": "22a0fd76-0677-42c6-9ca4-5623540cc237"
+    },
+    {
+      "name": "__Secure-neon-auth.session_token",
+      "value": "cLRpdH1Pld6EctfLSCHvG6wm27mOB3LA.2PhZg3UcTIJHp4dwto6LE4gqC+Tz5j1HeKBm7H4ALtk="
+    },
+    {
+      "name": "__next_hmr_refresh_hash__",
+      "value": "25"
+    }
+  ],
+  "sessionData": {
+    "session": {
+      "expiresAt": "2026-03-17T09:31:26.498Z",
+      "token": "cLRpdH1Pld6EctfLSCHvG6wm27mOB3LA",
+      "createdAt": "2026-03-10T09:31:26.498Z",
+      "updatedAt": "2026-03-10T09:31:26.498Z",
+      "ipAddress": "42.111.104.31",
+      "userAgent": "node",
+      "userId": "aafb6e4b-d11b-4bc9-8eb6-6379d1d57118",
+      "impersonatedBy": null,
+      "activeOrganizationId": null,
+      "id": "657e1de9-3707-457d-bb3c-802fdf419db5"
+    },
+    "user": {
+      "name": "Mehnaz Ali",
+      "email": "test1@exm.com",
+      "emailVerified": false,
+      "image": null,
+      "createdAt": "2026-03-10T09:31:16.397Z",
+      "updatedAt": "2026-03-10T09:31:16.397Z",
+      "role": "user",
+      "banned": false,
+      "banReason": null,
+      "banExpires": null,
+      "id": "aafb6e4b-d11b-4bc9-8eb6-6379d1d57118"
+    }
+  }
+}
