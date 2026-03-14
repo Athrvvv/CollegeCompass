@@ -18,7 +18,19 @@ export async function getColleges() {
         FROM college_courses cc
         JOIN courses co ON cc.course_id = co.course_id
         WHERE cc.college_id = c.college_id
-      ) as courses_data
+      ) as courses_data,
+      (
+        SELECT COALESCE(json_agg(e.name), '[]'::json)
+        FROM college_exams ce
+        JOIN exams e ON ce.exam_id = e.exam_id
+        WHERE ce.college_id = c.college_id
+      ) as exams_data,
+      (
+        SELECT COALESCE(json_agg(s.specialization_name), '[]'::json)
+        FROM college_specializations cs
+        JOIN specializations s ON cs.specialization_id = s.specialization_id
+        WHERE cs.college_id = c.college_id
+      ) as specializations_data
     FROM colleges c
     ORDER BY c.college_id
   `;

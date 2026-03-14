@@ -1,10 +1,9 @@
 import { auth } from "@/lib/auth/server"
-import { getColleges } from "./actions"
+import { getColleges } from "@/app/actions/getColleges"
 
 import ChatSidebar from "@/components/dashboard/ChatSidebar"
-import PaginatedCollegeList from "@/components/dashboard/PaginatedCollegeList"
 import Topbar from "@/components/dashboard/Topbar"
-import ReportSidebar from "@/components/dashboard/ReportSidebar"
+import DashboardClient from "@/components/dashboard/DashboardClient"
 
 export const dynamic = "force-dynamic"
 
@@ -16,13 +15,16 @@ export default async function DashboardPage(
 
   const { data: session } = await auth.getSession()
 
-  const { colleges, totalPages } = await getColleges(1, 9, query)
+  // Fetch all colleges using the global rich data action
+  const colleges = await getColleges()
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="flex flex-col h-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
       
       {/* FULL WIDTH TOPBAR */}
-      <Topbar />
+      <div className="shrink-0">
+        <Topbar />
+      </div>
 
       {/* THREE COLUMN LAYOUT ENCOMPASSING REMAINDER OF HEIGHT */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
@@ -30,18 +32,11 @@ export default async function DashboardPage(
         {/* LEFT SIDEBAR */}
         <ChatSidebar />
 
-        {/* MAIN CONTENT (SCROLLABLE GRID) */}
-        <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto p-4 md:p-6">
-          <PaginatedCollegeList 
-            key={query} 
-            initialColleges={colleges} 
-            initialTotalPages={totalPages} 
-            initialSearchQuery={query} 
-          />
-        </main>
-
-        {/* RIGHT SIDEBAR */}
-        <ReportSidebar />
+        {/* MAIN DASHBOARD CLIENT (CONTENT + ADVANCED FILTERS) */}
+        <DashboardClient 
+          initialColleges={colleges}
+          initialSearchQuery={query}
+        />
 
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useNotebook } from "@/context/NotebookContext"
 
 export default function DashboardCard({
   college_id,
@@ -34,6 +35,7 @@ export default function DashboardCard({
   top_exams?: string[]
 }) {
   const router = useRouter()
+  const { addNote, removeNote, isInNotebook } = useNotebook()
   const [imgSrc, setImgSrc] = useState(logo || "/college-placeholder.png")
 
   function handleNavigate() {
@@ -58,9 +60,42 @@ export default function DashboardCard({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-1" title={title}>
-            {title}
-          </h2>
+          <div className="flex items-start justify-between">
+            <h2 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-1" title={title}>
+              {title}
+            </h2>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isInNotebook(college_id.toString())) {
+                  removeNote(college_id.toString());
+                } else {
+                  addNote({
+                    note_name: title,
+                    data: [{ college_id, title, city, state, highest_package, avg_package, rating, typeofuni }],
+                    remark: `Saved from dashboard search.`,
+                    note_id: college_id.toString()
+                  });
+                }
+              }}
+              className={`p-1.5 rounded-full transition-all duration-300 -mt-1 -mr-1 ${
+                isInNotebook(college_id.toString())
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50/50'
+              }`}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill={isInNotebook(college_id.toString()) ? "currentColor" : "none"} 
+                stroke="currentColor" 
+                className="w-4 h-4"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+              </svg>
+            </button>
+          </div>
           <p className="text-gray-500 text-xs truncate mt-0.5">
             {city}, {state}
           </p>

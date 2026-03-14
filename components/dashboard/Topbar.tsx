@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { authClient } from "@/lib/auth/client"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Link from "next/link"
 
 
 export default function Topbar() {
 
   const router = useRouter()
+  const pathname = usePathname()
 
-  const [featuresOpen, setFeaturesOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
   const searchParams = useSearchParams()
@@ -52,11 +52,19 @@ export default function Topbar() {
     router.push("/")
   }
 
+  const tabs = [
+    { name: "AI Search", href: "/dashboard" },
+    { name: "Explore", href: "/dashboard/explore" },
+    { name: "Compare", href: "/dashboard/compare" },
+    { name: "Cutoff Trends", href: "/dashboard/cutoff" },
+    { name: "Notebook", href: "/dashboard/notebook" },
+  ]
+
   return (
     <div className="w-full bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-xl z-50 sticky top-0">
 
       {/* SEARCH BAR */}
-      <form onSubmit={handleSearch} className="group flex items-center w-full max-w-3xl bg-gray-50 hover:bg-white border border-gray-100 focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
+      <form onSubmit={handleSearch} className="group flex items-center w-full max-w-xl bg-gray-50 hover:bg-white border border-gray-100 focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 transition-colors duration-300 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
@@ -74,77 +82,31 @@ export default function Topbar() {
         </kbd>
       </form>
 
+      {/* TABS SECTION */}
+      <nav className="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100 mx-4">
+        {tabs.map((tab) => {
+          const isActive = pathname === tab.href
+          return (
+            <Link
+              key={tab.name}
+              href={tab.href}
+              className={`relative px-4 py-1.5 text-sm font-medium transition-all duration-300 ease-out rounded-lg
+                ${isActive 
+                  ? 'text-blue-600 bg-white shadow-sm ring-1 ring-black/5' 
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100/50'
+                }`}
+            >
+              {tab.name}
+              {isActive && (
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.6)]"></span>
+              )}
+            </Link>
+          )
+        })}
+      </nav>
+
       {/* RIGHT SECTION */}
-      <div className="flex items-center gap-6 shrink-0 ml-4">
-
-        {/* FEATURES DROPDOWN */}
-        <div
-          className="relative"
-          onMouseEnter={() => setFeaturesOpen(true)}
-          onMouseLeave={() => setFeaturesOpen(false)}
-        >
-          <button className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 py-2 transition-colors duration-200">
-            Features
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 transition-transform duration-300 ${featuresOpen ? 'rotate-180 text-gray-900' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {/* Invisible padding to prevent hover gap issues */}
-          <div className="absolute top-full left-0 w-full h-2" />
-
-          <div 
-            className={`absolute right-0 top-[calc(100%+8px)] w-64 z-50 transition-all duration-300 origin-top-right
-              ${featuresOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
-          >
-            <div className="bg-white border border-gray-100 rounded-xl shadow-xl shadow-gray-200/50 p-2 overflow-hidden ring-1 ring-black/5">
-              <div className="flex flex-col">
-                
-                <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
-                  <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600 group-hover/item:bg-blue-100 group-hover/item:scale-105 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">AI Search</div>
-                    <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Conversational college discovery</div>
-                  </div>
-                </div>
-
-                <Link href="/dashboard/explore" className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
-                  <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-purple-50 text-purple-600 group-hover/item:bg-purple-100 group-hover/item:scale-105 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">Explore Colleges</div>
-                    <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Browse extensive databases</div>
-                  </div>
-                </Link>
-
-
-                <Link href="/dashboard/compare" className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
-                  <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-amber-50 text-amber-600 group-hover/item:bg-amber-100 group-hover/item:scale-105 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">Compare</div>
-                    <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Side-by-side analysis</div>
-                  </div>
-                </Link>
-
-                <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
-                  <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 group-hover/item:bg-emerald-100 group-hover/item:scale-105 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">Cutoff Trends</div>
-                    <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Historical admission data</div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="flex items-center gap-6 shrink-0">
 
 
         {/* PROFILE SECTION */}

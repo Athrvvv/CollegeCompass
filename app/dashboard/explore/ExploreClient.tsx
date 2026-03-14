@@ -1,232 +1,241 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
-import FilterSidebar from "@/components/explore/FilterSidebar"
-import DashboardGrid from "@/components/dashboard/DashboardGrid"
+import { useState, useMemo } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import { useSearchParams } from "next/navigation"
 
 export default function ExploreClient({ colleges }: { colleges: any[] }) {
   const searchParams = useSearchParams()
-  const q = searchParams.get('q') || ""
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || "")
 
-  const [filters, setFilters] = useState({
-    states: [] as string[],
-    types: [] as string[],
-    packageRange: [0, 100] as [number, number],
-    feeRange: [0, 5000000] as [number, number],
-    minInfraRating: 0,
-    levels: [] as string[],
-    streams: [] as string[]
-  })
-
-  // Pagination state - updated to 18 per page
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 18
-
-  // Extract metadata for sidebar
-  const availableStates = useMemo(() => Array.from(new Set(colleges.map(c => c.state).filter(Boolean))), [colleges])
-  const availableTypes = useMemo(() => Array.from(new Set(colleges.map(c => c.typeofuni).filter(Boolean))), [colleges])
-  
-  const availableStreams = useMemo(() => {
-    const streams = new Set<string>()
-    colleges.forEach(c => c.courses_data?.forEach((course: any) => streams.add(course.name)))
-    return Array.from(streams)
+  // 1. TOP PLACEMENTS (Placement Powerhouses)
+  const placementPowerhouses = useMemo(() => {
+    return [...colleges]
+      .sort((a, b) => (Number(b.latest_highest_package) || 0) - (Number(a.latest_highest_package) || 0))
+      .slice(0, 6)
   }, [colleges])
 
-  const availableLevels = useMemo(() => {
-    const levels = new Set<string>()
-    colleges.forEach(c => c.courses_data?.forEach((course: any) => levels.add(course.level)))
-    return Array.from(levels)
+  // 2. TOP RANKED (Campus Excellence)
+  const campusExcellence = useMemo(() => {
+    return [...colleges]
+      .sort((a, b) => (Number(b.infra_rating) || 0) - (Number(a.infra_rating) || 0))
+      .slice(0, 6)
   }, [colleges])
 
-  // Advanced Filtering Logic
-  const filteredColleges = useMemo(() => {
-    return colleges.filter(college => {
-      // 1. Text Search
-      const matchSearch = q 
-        ? college.college_name.toLowerCase().includes(q.toLowerCase()) || 
-          college.city.toLowerCase().includes(q.toLowerCase()) || 
-          college.state.toLowerCase().includes(q.toLowerCase())
-        : true
-
-      // 2. State & Type
-      const matchState = filters.states.length > 0 ? filters.states.includes(college.state) : true
-      const matchType = filters.types.length > 0 ? filters.types.includes(college.typeofuni) : true
-
-      // 3. Package Range
-      const pkg = Number(college.latest_highest_package) || 0
-      const matchPkg = pkg >= filters.packageRange[0] && pkg <= filters.packageRange[1]
-
-      // 4. Fee (Max fee among college courses should be within selected range)
-      const collegeFees = college.courses_data?.map((c: any) => Number(c.fee) || 0) || [0]
-      const maxColFee = Math.max(...collegeFees)
-      const matchFee = maxColFee <= filters.feeRange[1]
-
-      // 5. Rating
-      const infra = Number(college.infra_rating) || 0
-      const matchRating = infra >= filters.minInfraRating
-
-      // 6. Levels & Streams
-      const collegeLevels = college.courses_data?.map((c: any) => c.level) || []
-      const collegeCourses = college.courses_data?.map((c: any) => c.name) || []
-      
-      const matchLevel = filters.levels.length > 0 
-        ? filters.levels.some(l => collegeLevels.includes(l)) 
-        : true
-        
-      const matchStream = filters.streams.length > 0 
-        ? filters.streams.some(s => collegeCourses.includes(s)) 
-        : true
-
-      return matchSearch && matchState && matchType && matchPkg && matchFee && matchRating && matchLevel && matchStream
+  // 3. REGIONAL HUBS (Explore by State)
+  const states = useMemo(() => {
+    const counts: Record<string, number> = {}
+    colleges.forEach(c => {
+      if (c.state) counts[c.state] = (counts[c.state] || 0) + 1
     })
-  }, [colleges, q, filters])
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+  }, [colleges])
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [filters, q])
+  // 4. ACADEMIC STREAMS
+  const academicStreams = useMemo(() => {
+    const streams: Record<string, number> = {}
+    colleges.forEach(c => {
+      c.courses_data?.forEach((course: any) => {
+        if (course.name) streams[course.name] = (streams[course.name] || 0) + 1
+      })
+    })
+    return Object.entries(streams)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+  }, [colleges])
 
-  // Paginated Results
-  const paginatedColleges = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return filteredColleges.slice(startIndex, startIndex + itemsPerPage)
-  }, [filteredColleges, currentPage])
+  // Global Search Filtered Results
+  const filteredColleges = useMemo(() => {
+    if (!searchQuery) return []
+    return colleges.filter(college =>
+      college.college_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      college.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      college.state.toLowerCase().includes(searchQuery.toLowerCase())
+    ).slice(0, 24)
+  }, [colleges, searchQuery])
 
-  const totalPages = Math.ceil(filteredColleges.length / itemsPerPage)
+  const SectionHeader = ({ title, subtitle, icon }: { title: string, subtitle: string, icon: string }) => (
+    <div className="mb-8">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="text-2xl">{icon}</span>
+        <h2 className="text-2xl font-black text-gray-900 tracking-tighter uppercase italic">{title}</h2>
+      </div>
+      <p className="text-gray-400 font-bold text-sm tracking-widest uppercase">{subtitle}</p>
+    </div>
+  )
 
   return (
-    <div className="max-w-[1600px] mx-auto px-6 lg:px-12 py-16 min-h-screen">
+    <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-16 min-h-screen space-y-24">
       
-      {/* Dynamic Header */}
-      <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="bg-indigo-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Global Discovery</span>
-            <div className="h-px w-12 bg-gray-100" />
-            <span className="text-gray-300 text-[10px] font-bold uppercase tracking-widest">{filteredColleges.length} Institutions Found</span>
+      {/* Hero Search Section */}
+      <section className="relative py-20 overflow-hidden rounded-[48px] bg-gray-900">
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-600/20 via-transparent to-violet-600/20" />
+        <div className="relative z-10 px-8 text-center max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center gap-3 mb-6"
+          >
+            <span className="h-px w-8 bg-indigo-500" />
+            <span className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.4em]">Academic Discovery Hub v3.0</span>
+            <span className="h-px w-8 bg-indigo-500" />
+          </motion.div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none mb-10"
+          >
+            Explore the <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-violet-400 italic">Universe</span> of Education.
+          </motion.h1>
+          
+          <div className="relative max-w-2xl mx-auto group">
+            <input 
+              type="text"
+              placeholder="Search by college name, city, or state..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/5 border-2 border-white/10 rounded-2xl py-6 px-8 text-white text-xl placeholder-white/20 outline-none focus:border-indigo-500 focus:bg-white/10 transition-all shadow-2xl"
+            />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-indigo-600 text-white px-6 py-2 rounded-xl font-black text-xs uppercase tracking-widest">
+              Ctrl + K
+            </div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tighter leading-none">
-            Find your <span className="text-transparent bg-clip-text bg-linear-to-r from-gray-900 via-indigo-600 to-violet-600">Future.</span>
-          </h1>
-          <p className="text-gray-400 font-bold mt-6 text-xl max-w-xl leading-relaxed">
-            Advanced search across {colleges.length} premium colleges. Filter by placements, fees, and global infrastructure ratings.
-          </p>
         </div>
+      </section>
 
-        {/* Quick View Stats */}
-        <div className="flex gap-4">
-          <div className="bg-gray-50 border border-gray-100 rounded-[32px] p-6 text-center min-w-[140px]">
-            <div className="text-2xl font-black text-gray-900 leading-none">18</div>
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Per Page</div>
-          </div>
-          <div className="bg-indigo-600 rounded-[32px] p-6 text-center min-w-[140px] shadow-xl shadow-indigo-600/20">
-            <div className="text-2xl font-black text-white leading-none">{filteredColleges.length}</div>
-            <div className="text-[10px] font-black text-indigo-200 uppercase tracking-widest mt-2">Matching</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-20">
-        
-        {/* Advanced Sidebar */}
-        <FilterSidebar 
-          onFilterChange={setFilters} 
-          activeFilters={filters} 
-          availableStates={availableStates}
-          availableTypes={availableTypes}
-          availableStreams={availableStreams}
-          availableLevels={availableLevels}
-        />
-
-        {/* Results Engine */}
-        <div className="flex-1 min-w-0">
-          {filteredColleges.length > 0 ? (
-            <div className="space-y-16">
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                {paginatedColleges.map((college) => (
-                  <DashboardCard
-                    key={college.college_id}
-                    college_id={college.college_id}
-                    title={college.college_name}
-                    description={college.typeofuni}
-                    logo={college.logo_url}
-                    rating={college.rating}
-                    city={college.city}
-                    state={college.state}
-                    established={college.established_year}
-                    typeofuni={college.typeofuni}
-                    approvals={college.approvals}
-                    highest_package={college.latest_highest_package}
-                    avg_package={college.latest_avg_package}
-                    top_exams={college.top_exams}
-                  />
+      {/* Search Results */}
+      <AnimatePresence>
+        {searchQuery && (
+          <motion.section 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="space-y-8"
+          >
+            <SectionHeader 
+              title="Global Search" 
+              subtitle={`${filteredColleges.length} matches found for "${searchQuery}"`}
+              icon="🔍"
+            />
+            {filteredColleges.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredColleges.map((college) => (
+                  <DashboardCard key={college.college_id} {...college} title={college.college_name} highest_package={college.latest_highest_package} avg_package={college.latest_avg_package} />
                 ))}
               </div>
-
-              {/* Ultra-Modern Pagination */}
-              {totalPages > 1 && (
-                <div className="flex flex-col items-center gap-6 pb-20 mt-12">
-                  <div className="h-px w-full bg-gray-100 mb-4" />
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white border-2 border-gray-100 text-gray-900 hover:border-indigo-600 disabled:opacity-30 disabled:hover:border-gray-100 transition-all active:scale-95 group"
-                    >
-                      <svg className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    
-                    <div className="flex items-center gap-2 px-8 py-4 bg-gray-900 rounded-2xl shadow-2xl">
-                      <span className="text-lg font-black text-white tracking-tighter">Page {currentPage}</span>
-                      <span className="text-gray-500 font-bold mx-2">of</span>
-                      <span className="text-lg font-black text-indigo-400 tracking-tighter">{totalPages}</span>
-                    </div>
-
-                    <button
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                      className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white border-2 border-gray-100 text-gray-900 hover:border-indigo-600 disabled:opacity-30 disabled:hover:border-gray-100 transition-all active:scale-95 group"
-                    >
-                      <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Institutional Explorer Engine v2.0</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-32 bg-gray-50/50 rounded-[64px] border-4 border-dashed border-gray-200 animate-in zoom-in-95 duration-700">
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl mb-8 relative">
-                <div className="absolute inset-0 rounded-full bg-indigo-500/10 animate-ping" />
-                <span className="text-4xl">🔭</span>
+            ) : (
+              <div className="py-20 text-center bg-gray-50 rounded-[32px] border-2 border-dashed border-gray-200">
+                <p className="text-gray-400 font-black text-xl italic uppercase tracking-widest">No signals detected in this sector.</p>
               </div>
-              <h3 className="text-3xl font-black text-gray-900 tracking-tighter">No Matches Found</h3>
-              <p className="text-gray-400 font-bold mt-3 text-center max-w-sm px-6 text-xl">
-                We couldn't locate any institutions with those specific criteria. Try expanding your search horizons!
-              </p>
-              <button 
-                onClick={() => setFilters({
-                  states: [],
-                  types: [],
-                  packageRange: [0, 100],
-                  feeRange: [0, 5000000],
-                  minInfraRating: 0,
-                  levels: [],
-                  streams: []
-                })}
-                className="mt-12 font-black text-sm text-white bg-gray-900 hover:bg-black uppercase tracking-widest px-10 py-5 rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-95"
-              >
-                Reset Deep Filters
-              </button>
+            )}
+            <div className="h-px w-full bg-linear-to-r from-transparent via-gray-100 to-transparent my-20" />
+          </motion.section>
+        )}
+      </AnimatePresence>
+
+      {/* Discovery Hub Grid */}
+      <div className="space-y-32">
+        
+        {/* Placement Powerhouses */}
+        <section>
+          <SectionHeader 
+            title="Placement Powerhouses" 
+            subtitle="Institutions leading the career trajectory charts"
+            icon="🚀"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {placementPowerhouses.map((college) => (
+              <DashboardCard key={college.college_id} {...college} title={college.college_name} highest_package={college.latest_highest_package} avg_package={college.latest_avg_package} />
+            ))}
+          </div>
+        </section>
+
+        {/* Campus Excellence */}
+        <section>
+          <SectionHeader 
+            title="Campus Excellence" 
+            subtitle="Top-tier infrastructure and academic environments"
+            icon="🏛️"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {campusExcellence.map((college) => (
+              <DashboardCard key={college.college_id} {...college} title={college.college_name} highest_package={college.latest_highest_package} avg_package={college.latest_avg_package} />
+            ))}
+          </div>
+        </section>
+
+        {/* Categories Bento */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          
+          {/* Regional Hubs */}
+          <section className="bg-gray-50 rounded-[48px] p-12 border border-gray-100">
+            <SectionHeader 
+              title="Regional Hubs" 
+              subtitle="Major educational centers by state"
+              icon="📍"
+            />
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              {states.map(([state, count]) => (
+                <div key={state} className="bg-white p-6 rounded-2xl border border-gray-100 hover:border-indigo-600 transition-all group flex items-center justify-between cursor-pointer">
+                  <div>
+                    <h3 className="font-black text-gray-900 uppercase tracking-tighter text-lg">{state}</h3>
+                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">{count} Institutions</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+          </section>
+
+          {/* Academic Streams */}
+          <section className="bg-gray-900 rounded-[48px] p-12 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px]" />
+            <div className="relative z-10">
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">🎓</span>
+                  <h2 className="text-2xl font-black text-white tracking-tighter uppercase italic">Academic Streams</h2>
+                </div>
+                <p className="text-indigo-400 font-bold text-sm tracking-widest uppercase">Specializations & Disciplines</p>
+              </div>
+              <div className="flex flex-wrap gap-4 mt-8">
+                {academicStreams.map(([stream, count]) => (
+                  <div key={stream} className="bg-white/5 border border-white/10 px-6 py-4 rounded-2xl hover:bg-white/10 hover:border-indigo-500 transition-all cursor-pointer group">
+                    <h3 className="text-white font-black uppercase tracking-tight text-sm mb-1 group-hover:text-indigo-400 transition-colors">{stream}</h3>
+                    <p className="text-white/40 text-[9px] font-bold uppercase tracking-[0.2em]">{count} Programs</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
         </div>
+
+        {/* Realistic Stats Bar */}
+        <section className="py-20 border-y border-gray-100 flex flex-wrap items-center justify-around gap-12">
+          <div className="text-center">
+            <div className="text-4xl font-black text-gray-900 tracking-tighter mb-2">{colleges.length}</div>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Verified Institutions</div>
+          </div>
+          <div className="h-12 w-px bg-gray-100 hidden md:block" />
+          <div className="text-center">
+            <div className="text-4xl font-black text-gray-900 tracking-tighter mb-2">850k+</div>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Live Data Points</div>
+          </div>
+          <div className="h-12 w-px bg-gray-100 hidden md:block" />
+          <div className="text-center">
+            <div className="text-4xl font-black text-gray-900 tracking-tighter mb-2">24/7</div>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Discovery Engine</div>
+          </div>
+        </section>
 
       </div>
     </div>
