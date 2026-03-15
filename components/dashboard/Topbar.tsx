@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { authClient } from "@/lib/auth/client"
+import { motion } from "framer-motion"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Link from "next/link"
 
@@ -54,10 +55,11 @@ export default function Topbar() {
 
   const tabs = [
     { name: "AI Search", href: "/dashboard" },
-    { name: "Explore", href: "/dashboard/explore" },
+    { name: "AI Advisor", href: "/dashboard/advisor" },
     { name: "Compare", href: "/dashboard/compare" },
     { name: "Cutoff Trends", href: "/dashboard/cutoff" },
     { name: "Notebook", href: "/dashboard/notebook" },
+    { name: "FYP", href: "/dashboard/fyp" },
   ]
 
   return (
@@ -93,10 +95,25 @@ export default function Topbar() {
               className={`relative px-4 py-1.5 text-sm font-medium transition-all duration-300 ease-out rounded-lg
                 ${isActive 
                   ? 'text-blue-600 bg-white shadow-sm ring-1 ring-black/5' 
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100/50'
+                  : tab.name === "FYP"
+                    ? 'text-gray-900 group/fyp'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100/50'
                 }`}
             >
-              {tab.name}
+              {tab.name === "FYP" && !isActive && (
+                <>
+                  {/* Enhanced Rainbow Border Shim */}
+                  <div className="absolute -inset-[1px] rounded-lg p-[1.5px] bg-linear-to-r from-red-500 via-blue-500 to-purple-500 -z-10 opacity-70 group-hover/fyp:opacity-100 group-hover/fyp:animate-rainbow-loop-once transition-all duration-300">
+                    <div className="absolute inset-[1px] bg-white rounded-[7px]" />
+                  </div>
+                  {/* Enhanced Glow */}
+                  <div className="absolute -inset-[1px] rounded-lg shadow-[0_0_12px_-2px_rgba(37,99,235,0.2)] group-hover/fyp:shadow-[0_0_18px_-2px_rgba(168,85,247,0.5)] transition-all duration-300 -z-20" />
+                </>
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                {tab.name}
+                {tab.name === "FYP" && <span className="text-[10px] animate-bounce">✨</span>}
+              </span>
               {isActive && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.6)]"></span>
               )}
@@ -140,7 +157,10 @@ export default function Topbar() {
             <div className="bg-white border border-gray-100 rounded-xl shadow-xl shadow-gray-200/50 p-2 overflow-hidden ring-1 ring-black/5">
               <div className="flex flex-col">
 
-                <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
+                <Link 
+                  href="/dashboard/profile"
+                  className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+                >
                   <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 text-gray-600 group-hover/item:bg-gray-100 group-hover/item:text-gray-900 group-hover/item:scale-105 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
@@ -148,7 +168,7 @@ export default function Topbar() {
                     <div className="text-sm font-medium text-gray-900">Profile</div>
                     <div className="text-[11px] text-gray-500 leading-tight mt-0.5 text-balance">Manage your account</div>
                   </div>
-                </div>
+                </Link>
 
                 <div className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
                   <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 text-gray-600 group-hover/item:bg-gray-100 group-hover/item:text-gray-900 group-hover/item:scale-105 transition-all">

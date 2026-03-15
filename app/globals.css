@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,53 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
+}
+
+@keyframes rainbow-border-loop {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(180deg) brightness(1.5) drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
+  }
+  100% {
+    background-position: 200% 50%;
+    filter: hue-rotate(360deg) brightness(1);
+  }
+}
+
+.animate-rainbow-loop-once {
+  background-size: 200% 200%;
+  animation: rainbow-border-loop 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+}
+
+.prose li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }

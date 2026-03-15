@@ -41,7 +41,7 @@ export default function NotesList({
       {notes.map((note, index) => {
         const points = note.data?.[0] 
           ? [
-              `${note.data[0].city}, ${note.data[0].state}`,
+              note.data[0].city && note.data[0].state ? `${note.data[0].city}, ${note.data[0].state}` : null,
               note.data[0].highest_package ? `₹${note.data[0].highest_package} LPA Max` : null,
               note.data[0].rating ? `${note.data[0].rating} Infrastructure` : null
             ].filter(Boolean) as string[]
@@ -59,6 +59,7 @@ export default function NotesList({
               title={note.note_name}
               points={points}
               remark={note.remark}
+              advisorContent={note.data?.[0]?.advisor_content}
               selected={selectedNotes.includes(note.note_id)}
               toggleSelect={toggleSelect}
             />

@@ -5,6 +5,7 @@ type Props = {
   title: string
   points: string[]
   remark?: string
+  advisorContent?: string
   selected: boolean
   toggleSelect: (id: string) => void
 }
@@ -14,6 +15,7 @@ export default function NoteCard({
   title,
   points,
   remark,
+  advisorContent,
   selected,
   toggleSelect,
 }: Props) {
@@ -39,12 +41,21 @@ export default function NoteCard({
       </div>
 
       <ul className="text-gray-400 text-xs space-y-2 font-medium">
-        {points.slice(0, 3).map((p, i) => (
-          <li key={i} className="flex gap-2">
-            <span className="text-blue-500">•</span>
-            <span>{p}</span>
+        {points.length > 0 ? (
+          points.slice(0, 3).map((p, i) => (
+            <li key={i} className="flex gap-2">
+              <span className="text-blue-500">•</span>
+              <span>{p}</span>
+            </li>
+          ))
+        ) : advisorContent ? (
+          <li className="flex flex-col gap-2">
+            <span className="text-blue-400 font-bold uppercase tracking-widest text-[9px]">AI Advisory Preview</span>
+            <p className="line-clamp-4 text-gray-300 italic leading-relaxed">
+              "{advisorContent.replace(/[#*`]/g, '').substring(0, 150)}..."
+            </p>
           </li>
-        ))}
+        ) : null}
         {remark && (
           <li className="mt-2 text-[10px] italic text-gray-500 border-t border-gray-800/50 pt-2">
             {remark}
