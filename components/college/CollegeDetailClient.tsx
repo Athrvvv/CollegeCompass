@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 
-type TabType = "Info" | "Courses & Fees" | "CutOff" | "Placement" | "Reviews"
+type TabType = "Info" | "Courses & Fees" | "CutOff" | "Placement" | "Reviews" | "Location"
 
 export default function CollegeDetailClient({
   college,
@@ -15,7 +15,7 @@ export default function CollegeDetailClient({
   const [activeTab, setActiveTab] = useState<TabType>("Info")
   const [imgSrc, setImgSrc] = useState(college.logo_url || "/college-placeholder.png")
 
-  const TABS: TabType[] = ["Info", "Courses & Fees", "CutOff", "Placement", "Reviews"]
+  const TABS: TabType[] = ["Info", "Courses & Fees", "CutOff", "Placement", "Reviews", "Location"]
 
   return (
     <div className="flex flex-col lg:flex-row w-full h-full bg-white relative">
@@ -230,6 +230,53 @@ export default function CollegeDetailClient({
                        </div>
                      ))}
                    </div>
+                </div>
+              )}
+
+              {activeTab === "Location" && (
+                <div className="bg-white p-0 rounded-2xl border border-gray-100 shadow-xl overflow-hidden relative group h-[500px]">
+                  {/* Google Maps Iframe */}
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    allowFullScreen
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(college.college_name + " " + college.city + " " + college.state)}&output=embed`}
+                    className="grayscale-[0.2] contrast-[1.1] transition-all duration-700 group-hover:grayscale-0"
+                  />
+
+                  {/* Glassmorphic Info Card Overlay */}
+                  <div className="absolute bottom-6 left-6 right-6 md:right-auto md:w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all duration-500 hover:bg-white/90 hover:shadow-[0_12px_48px_rgba(0,0,0,0.15)]">
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 leading-tight mb-1">
+                          {college.college_name}
+                        </h3>
+                        <p className="text-sm text-gray-600 flex items-center gap-1.5 font-medium">
+                          <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {college.city}, {college.state}
+                        </p>
+                      </div>
+
+                      <div className="h-px bg-gray-200/50 w-full" />
+
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(college.college_name + " " + college.city + " " + college.state)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-indigo-600 text-white rounded-xl text-sm font-bold transition-all duration-300 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L16 4m0 13V4m0 0L9 7" />
+                        </svg>
+                        Get Directions
+                      </a>
+                    </div>
+                  </div>
                 </div>
               )}
 
