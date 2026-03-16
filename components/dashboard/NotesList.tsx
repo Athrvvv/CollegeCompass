@@ -10,7 +10,7 @@ export default function NotesList({
 }: { 
   onSelectionChange?: (ids: string[]) => void 
 }) {
-  const { notes } = useNotebook()
+  const { notes, removeNote } = useNotebook()
   const [selectedNotes, setSelectedNotes] = useState<string[]>([])
 
   function toggleSelect(id: string) {
@@ -20,6 +20,16 @@ export default function NotesList({
         
     setSelectedNotes(newSelection);
     onSelectionChange?.(newSelection);
+  }
+
+  function handleRemove(id: string) {
+    removeNote(id);
+    // Also remove from selection if selected
+    if (selectedNotes.includes(id)) {
+      const newSelection = selectedNotes.filter(n => n !== id);
+      setSelectedNotes(newSelection);
+      onSelectionChange?.(newSelection);
+    }
   }
 
   if (notes.length === 0) {
@@ -39,13 +49,53 @@ export default function NotesList({
   return (
     <>
       {notes.map((note, index) => {
-        const points = note.data?.[0] 
-          ? [
-              note.data[0].city && note.data[0].state ? `${note.data[0].city}, ${note.data[0].state}` : null,
-              note.data[0].highest_package ? `₹${note.data[0].highest_package} LPA Max` : null,
-              note.data[0].rating ? `${note.data[0].rating} Infrastructure` : null
-            ].filter(Boolean) as string[]
-          : [];
+        let chartData: any[] | undefined = undefined;
+        let chartType: "LINE" | "BAR" | undefined = undefined;
+        let points: string[] = [];
+
+        // Detect Cutoff Trend (Single)
+        if (note.data?.[0] && 'cutoff_history' in note.data[0]) {
+          chartType = "LINE";
+          // Convert history map to array for Recharts
+          const history = note.data[0].cutoff_history as Record<string, any>;
+          chartData = Object.entries(history)
+            .map(([year, categories]) => ({
+              year,
+              rank: categories["GEN"] || categories["General"] || Object.values(categories)[0]
+            }))
+            .sort((a, b) => Number(a.year) - Number(b.year));
+          
+          points = [
+            `Course: ${note.data[0].course_name}`,
+            `Exam: ${note.data[0].exam_name}`,
+            `Latest Rank: ${chartData[chartData.length - 1]?.rank?.toLocaleString() || 'N/A'}`
+          ];
+        } 
+        // Detect Comparison Benchmark (Bar)
+        else if (note.note_id.startsWith('comp-')) {
+          chartType = "BAR";
+          // We need to pivot the bench data into year-based bars
+          const years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+          chartData = years.map(y => {
+            const obj: any = { year: y };
+            note.data.forEach((benchItem, idx) => {
+              const hist = (benchItem as any).data?.find((h: any) => h.year === y);
+              if (hist && hist.ranks) {
+                obj[`val_${idx}`] = hist.ranks["GEN"] || hist.ranks["General"] || Object.values(hist.ranks)[0];
+              }
+            });
+            return obj;
+          });
+          points = [`Comparing ${note.data.length} Institutions`];
+        }
+        // Generic Note
+        else if (note.data?.[0]) {
+          points = [
+            note.data[0].city && note.data[0].state ? `${note.data[0].city}, ${note.data[0].state}` : null,
+            note.data[0].highest_package ? `₹${note.data[0].highest_package} LPA Max` : null,
+            note.data[0].rating ? `${note.data[0].rating} Infrastructure` : null
+          ].filter(Boolean) as string[];
+        }
 
         return (
           <motion.div
@@ -60,8 +110,11 @@ export default function NotesList({
               points={points}
               remark={note.remark}
               advisorContent={note.data?.[0]?.advisor_content}
+              chartData={chartData}
+              chartType={chartType}
               selected={selectedNotes.includes(note.note_id)}
               toggleSelect={toggleSelect}
+              onRemove={handleRemove}
             />
           </motion.div>
         );

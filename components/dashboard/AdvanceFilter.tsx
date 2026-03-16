@@ -13,6 +13,7 @@ export interface FilterState {
   levels: string[]
   exams: string[]
   specializations: string[]
+  streams: string[]
 }
 
 interface AdvanceFilterProps {
@@ -24,6 +25,7 @@ interface AdvanceFilterProps {
   availableLevels: string[]
   availableExams: string[]
   availableSpecializations: string[]
+  availableStreams: string[]
 }
 
 export default function AdvanceFilter({
@@ -34,7 +36,8 @@ export default function AdvanceFilter({
   availableTypes,
   availableLevels,
   availableExams,
-  availableSpecializations
+  availableSpecializations,
+  availableStreams
 }: AdvanceFilterProps) {
   const [isOpen, setIsOpen] = useState(true)
 
@@ -83,6 +86,15 @@ export default function AdvanceFilter({
     }))
   }
 
+  const handleToggleStream = (stream: string) => {
+    setFilters(prev => ({
+      ...prev,
+      streams: prev.streams.includes(stream)
+        ? prev.streams.filter(s => s !== stream)
+        : [...prev.streams, stream]
+    }))
+  }
+
   const resetFilters = () => {
     setFilters(() => ({
       minPackage: 0,
@@ -93,7 +105,8 @@ export default function AdvanceFilter({
       cities: [],
       levels: [],
       exams: [],
-      specializations: []
+      specializations: [],
+      streams: []
     }))
   }
 
@@ -206,6 +219,26 @@ export default function AdvanceFilter({
                 }`}
               >
                 {spec}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Streams Filter */}
+        <section>
+          <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4 block">Streams</label>
+          <div className="flex flex-wrap gap-2">
+            {availableStreams.map((stream) => (
+              <button
+                key={stream}
+                onClick={() => handleToggleStream(stream)}
+                className={`px-3 py-1.5 rounded-lg border-2 text-[10px] font-black uppercase tracking-wider transition-all ${
+                  filters.streams.includes(stream)
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'bg-white border-gray-50 text-gray-400 hover:border-gray-200'
+                }`}
+              >
+                {stream}
               </button>
             ))}
           </div>

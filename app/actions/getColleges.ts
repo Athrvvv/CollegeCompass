@@ -30,7 +30,14 @@ export async function getColleges() {
         FROM college_specializations cs
         JOIN specializations s ON cs.specialization_id = s.specialization_id
         WHERE cs.college_id = c.college_id
-      ) as specializations_data
+      ) as specializations_data,
+      (
+        SELECT COALESCE(json_agg(st.stream_name), '[]'::json)
+        FROM college_courses cc
+        JOIN courses co ON cc.course_id = co.course_id
+        JOIN streams st ON co.stream_id = st.stream_id
+        WHERE cc.college_id = c.college_id
+      ) as streams_data
     FROM colleges c
     ORDER BY c.college_id
   `;

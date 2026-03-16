@@ -1,0 +1,6 @@
+
+--- [2026-03-16T07:48:59.751Z] debug ---
+DB: postgresql://neondb_owner:npg_2LksMfGKzm7U@ep-wandering-wate...
+College ID: 1 (type: number)
+Rows found: 800
+First row: {"col":"IIMA - Indian Institute of Management,Ahmedabad","cou":"B.Com","yr":2016,"val":"6939"}
