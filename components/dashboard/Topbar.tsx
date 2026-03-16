@@ -1,24 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { authClient } from "@/lib/auth/client"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Link from "next/link"
 
-
-export default function Topbar() {
-
+function SearchInput() {
   const router = useRouter()
-  const pathname = usePathname()
-
-  const [profileOpen, setProfileOpen] = useState(false)
-
   const searchParams = useSearchParams()
   const q = searchParams.get('q') || ""
   const [searchQuery, setSearchQuery] = useState(q)
-
-  const [name, setName] = useState("")
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -29,15 +21,40 @@ export default function Topbar() {
     }
   }
 
+  return (
+    <form onSubmit={handleSearch} className="group flex items-center w-full max-w-xl bg-gray-50 hover:bg-white border border-gray-100 focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 transition-colors duration-300 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search colleges, courses..."
+        className="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400"
+      />
+      <button type="submit" className="hidden"></button>
+      <kbd className="hidden sm:flex items-center justify-center gap-1 bg-white border border-gray-200 rounded-full px-3 py-1 shadow-sm group-focus-within:opacity-0 group-focus-within:translate-x-2 transition-all duration-300 shrink-0">
+        <span className="text-[13px] leading-none text-gray-600 font-sans">⌘</span>
+        <span className="text-[11px] font-bold text-gray-600 uppercase">K</span>
+      </kbd>
+    </form>
+  )
+}
+
+export default function Topbar() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [name, setName] = useState("")
+
   useEffect(() => {
     async function loadSession() {
       const { data } = await authClient.getSession()
-
       if (data?.user?.name) {
         setName(formatName(data.user.name))
       }
     }
-
     loadSession()
   }, [])
 
@@ -65,24 +82,10 @@ export default function Topbar() {
   return (
     <div className="w-full bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-xl z-50 sticky top-0">
 
-      {/* SEARCH BAR */}
-      <form onSubmit={handleSearch} className="group flex items-center w-full max-w-xl bg-gray-50 hover:bg-white border border-gray-100 focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 transition-colors duration-300 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search colleges, courses..."
-          className="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400"
-        />
-        <button type="submit" className="hidden"></button>
-        <kbd className="hidden sm:flex items-center justify-center gap-1 bg-white border border-gray-200 rounded-full px-3 py-1 shadow-sm group-focus-within:opacity-0 group-focus-within:translate-x-2 transition-all duration-300 shrink-0">
-          <span className="text-[13px] leading-none text-gray-600 font-sans">⌘</span>
-          <span className="text-[11px] font-bold text-gray-600 uppercase">K</span>
-        </kbd>
-      </form>
+      {/* SEARCH BAR WITH SUSPENSE */}
+      <Suspense fallback={<div className="w-full max-w-xl bg-gray-50 rounded-full px-5 py-2.5 h-10 animate-pulse" />}>
+        <SearchInput />
+      </Suspense>
 
       {/* TABS SECTION */}
       <nav className="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100 mx-4">
@@ -102,11 +105,9 @@ export default function Topbar() {
             >
               {tab.name === "FYP" && !isActive && (
                 <>
-                  {/* Enhanced Rainbow Border Shim */}
-                  <div className="absolute -inset-[1px] rounded-lg p-[1.5px] bg-linear-to-r from-red-500 via-blue-500 to-purple-500 -z-10 opacity-70 group-hover/fyp:opacity-100 group-hover/fyp:animate-rainbow-loop-once transition-all duration-300">
+                  <div className="absolute -inset-[1px] rounded-lg p-[1.5px] bg-linear-to-r from-red-500 via-blue-500 to-purple-500 -z-10 opacity-70 group-hover/fyp:opacity-100 transition-all duration-300">
                     <div className="absolute inset-[1px] bg-white rounded-[7px]" />
                   </div>
-                  {/* Enhanced Glow */}
                   <div className="absolute -inset-[1px] rounded-lg shadow-[0_0_12px_-2px_rgba(37,99,235,0.2)] group-hover/fyp:shadow-[0_0_18px_-2px_rgba(168,85,247,0.5)] transition-all duration-300 -z-20" />
                 </>
               )}
@@ -125,38 +126,27 @@ export default function Topbar() {
       {/* RIGHT SECTION */}
       <div className="flex items-center gap-6 shrink-0">
 
-
         {/* PROFILE SECTION */}
         <div
           className="relative flex items-center gap-2"
           onMouseEnter={() => setProfileOpen(true)}
           onMouseLeave={() => setProfileOpen(false)}
         >
-
           <button className="group flex items-center gap-2.5 p-1 pr-3 rounded-full border border-transparent hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm transition-all duration-300 ease-out">
-            
-            {/* Avatar */}
             <div className="w-8 h-8 rounded-full bg-[#1b2533] text-white flex items-center justify-center text-sm font-bold shadow-sm ring-1 ring-white group-hover:scale-105 transition-all duration-300">
               {name ? name.charAt(0).toUpperCase() : "U"}
             </div>
-
-            {/* Username */}
             <span className="text-sm font-semibold text-gray-900 tracking-tight transition-colors duration-300">
               {name || "User"}
             </span>
-            
           </button>
-
-          {/* Invisible padding to prevent hover gap issues */}
           <div className="absolute top-full right-0 w-full h-2" />
-
           <div 
             className={`absolute right-0 top-[calc(100%+8px)] w-56 z-50 transition-all duration-300 origin-top-right
               ${profileOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
           >
             <div className="bg-white border border-gray-100 rounded-xl shadow-xl shadow-gray-200/50 p-2 overflow-hidden ring-1 ring-black/5">
               <div className="flex flex-col">
-
                 <Link 
                   href="/dashboard/profile"
                   className="group/item flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
@@ -198,11 +188,8 @@ export default function Topbar() {
               </div>
             </div>
           </div>
-
         </div>
-
       </div>
-
     </div>
   )
 }
