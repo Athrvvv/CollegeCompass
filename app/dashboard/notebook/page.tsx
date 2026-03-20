@@ -1,6 +1,5 @@
 "use client"
 
-import Topbar from "@/components/dashboard/Topbar"
 import NotesList from "@/components/dashboard/NotesList"
 import SynthesisPanel from "@/components/notebook/SynthesisPanel"
 import { motion } from "framer-motion"
@@ -10,10 +9,9 @@ export default function ReportPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0f18] text-gray-100 font-sans">
-      <Topbar />
+    <div className="flex flex-col h-full bg-[#0a0f18] text-gray-100 font-sans overflow-y-auto">
       
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 flex flex-col">
+      <div className="max-w-7xl mx-auto w-full px-6 py-12 flex flex-col">
         
         {/* HERO SECTION */}
         <motion.div 
@@ -92,7 +90,7 @@ export default function ReportPage() {
 
         </div>
 
-      </main>
+      </div>
     </div>
   )
 }

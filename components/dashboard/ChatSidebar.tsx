@@ -48,7 +48,7 @@ export default function ChatSidebar() {
       const { data } = await authClient.getSession()
       const sessionid = data?.session?.id || "default_session"
 
-      const response = await fetch("https://nlqt-service.onrender.com/query", {
+      const response = await fetch("https://nlqt-vsetence-transformer.onrender.com/query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

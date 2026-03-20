@@ -104,7 +104,7 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-68px)] overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden">
       
       {/* LEFT: FLOW CHART AREA */}
       <div className="flex-1 overflow-auto bg-[#f8fafc] p-4 lg:p-12 border-r border-slate-200">

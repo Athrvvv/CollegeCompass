@@ -74,7 +74,7 @@ export default function FYPPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-blue-500/30">
+    <div className="h-full bg-[#0a0a0a] text-white selection:bg-blue-500/30 overflow-y-auto">
       {/* Dynamic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
@@ -247,32 +247,32 @@ function PinterestCard({ college, index }: { college: any, index: number }) {
           </div>
           
           {/* Top Info Bar */}
-          <div className="absolute top-0 left-0 right-0 p-6 flex items-start justify-between z-20">
-             <div className="flex items-center gap-3">
-               <div className="relative w-12 h-12 bg-white rounded-2xl p-2 shadow-lg border border-white/20 transition-transform group-hover:scale-110">
+          <div className="absolute top-0 left-0 right-0 p-4 flex items-start justify-between z-30">
+             <div className="flex items-center gap-2">
+               <div className="relative w-10 h-10 bg-white rounded-xl p-1.5 shadow-lg border border-white/20 transition-transform group-hover:scale-110">
                  <Image
                     src={imgSrc}
                     alt={college.college_name}
                     fill
-                    className="object-contain p-1.5"
+                    className="object-contain p-1"
                     onError={() => setImgSrc("/college-placeholder.png")}
                  />
                </div>
-               <div className="bg-black/30 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/90">Strength: {Math.round(college.recommendationScore)}%</span>
+               <div className="bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-white/90">Match: {Math.round(college.recommendationScore)}%</span>
                </div>
              </div>
              
              <button 
                onClick={handleBookmark}
-               className={`w-10 h-10 rounded-full backdrop-blur-xl border flex items-center justify-center transition-all duration-300 ${isBookmarked ? 'bg-red-500 border-red-400 text-white' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
+               className={`w-9 h-9 rounded-full backdrop-blur-xl border flex items-center justify-center transition-all duration-300 ${isBookmarked ? 'bg-red-500 border-red-400 text-white shadow-lg shadow-red-500/20' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
              >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 24 24" 
                   fill={isBookmarked ? "currentColor" : "none"} 
                   stroke="currentColor" 
-                  className="w-5 h-5"
+                  className="w-4.5 h-4.5"
                   strokeWidth={2.5}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
@@ -281,41 +281,41 @@ function PinterestCard({ college, index }: { college: any, index: number }) {
           </div>
 
           {/* Bottom Glass Content */}
-          <div className="absolute inset-x-0 bottom-0 p-6 z-20">
-             <div className="p-6 bg-white/10 backdrop-blur-2xl rounded-4xl border border-white/20 space-y-4 group-hover:translate-y-[-5px] transition-transform duration-500 overflow-hidden">
-                <div className="space-y-1.5 min-w-0">
-                   <h2 className="text-xl font-black leading-tight tracking-tight line-clamp-2" title={college.college_name}>
+          <div className="absolute inset-x-0 bottom-0 p-4 z-20">
+             <div className="p-5 bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 space-y-3 group-hover:translate-y-[-5px] transition-transform duration-500 overflow-hidden">
+                <div className="space-y-1 min-w-0">
+                   <h2 className="text-lg font-black leading-tight tracking-tight line-clamp-2" title={college.college_name}>
                       {college.college_name}
                    </h2>
-                   <div className="flex items-center gap-2">
-                     <p className="text-blue-200/90 text-[11px] font-bold uppercase tracking-wider truncate">{college.city}, {college.state}</p>
+                   <div className="flex items-center gap-1.5">
+                     <p className="text-blue-200/90 text-[10px] font-bold uppercase tracking-wider truncate">{college.city}, {college.state}</p>
                      <div className="w-1 h-1 rounded-full bg-white/30" />
                      <div className="flex items-center gap-1">
-                        <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-2.5 h-2.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
-                        <span className="text-xs font-bold text-white">{college.rating}</span>
+                        <span className="text-[11px] font-bold text-white">{college.rating}</span>
                      </div>
                    </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                    {college.recommendationReasons.slice(0, 2).map((reason: string, i: number) => (
-                     <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-[9px] font-black border border-white/5 whitespace-nowrap text-white/90 uppercase tracking-tighter">
+                     <span key={i} className="px-2.5 py-0.5 bg-white/10 rounded-full text-[8px] font-black border border-white/5 whitespace-nowrap text-white/90 uppercase tracking-tighter">
                        {reason}
                      </span>
                    ))}
                 </div>
 
                 {/* Info Pills */}
-                <div className="flex items-center gap-4 pt-4 border-t border-white/5 h-0 overflow-hidden group-hover:h-auto group-hover:opacity-100 opacity-0 transition-all duration-500">
+                <div className="flex items-center gap-4 pt-3 border-t border-white/5 h-0 overflow-hidden group-hover:h-auto group-hover:opacity-100 opacity-0 transition-all duration-500">
                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-white/40 uppercase">Founded</span>
+                      <span className="text-[8px] font-bold text-white/40 uppercase">Founded</span>
                       <span className="text-xs font-black text-white">{college.established_year || "---"}</span>
                    </div>
                    <div className="w-px h-6 bg-white/5" />
                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-white/40 uppercase">Type</span>
+                      <span className="text-[8px] font-bold text-white/40 uppercase">Type</span>
                       <span className="text-xs font-black text-white truncate max-w-[80px]">{college.typeofuni || "Public"}</span>
                    </div>
                 </div>

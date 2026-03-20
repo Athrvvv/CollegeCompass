@@ -1,5 +1,4 @@
 import { getCollegeById, getCollegeDetails } from "@/app/dashboard/actions"
-import Topbar from "@/components/dashboard/Topbar"
 import CollegeDetailClient from "@/components/college/CollegeDetailClient"
 import { notFound } from "next/navigation"
 
@@ -25,12 +24,5 @@ export default async function CollegePage(
     notFound()
   }
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
-      <Topbar />
-      <main className="flex-1 w-full bg-white">
-        <CollegeDetailClient college={college} details={details} />
-      </main>
-    </div>
-  )
+  return <CollegeDetailClient college={college} details={details} />
 }

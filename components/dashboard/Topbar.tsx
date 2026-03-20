@@ -22,8 +22,8 @@ function SearchInput() {
   }
 
   return (
-    <form onSubmit={handleSearch} className="group flex items-center w-full max-w-xl bg-gray-50 hover:bg-white border border-gray-100 focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 transition-colors duration-300 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <form onSubmit={handleSearch} className="group flex items-center w-full max-w-xl bg-white/5 hover:bg-white/10 border border-white/10 focus-within:border-white/20 focus-within:bg-white/10 rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 group-focus-within:text-white transition-colors duration-300 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
       <input
@@ -31,12 +31,12 @@ function SearchInput() {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search colleges, courses..."
-        className="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400"
+        className="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-white placeholder-gray-500"
       />
       <button type="submit" className="hidden"></button>
-      <kbd className="hidden sm:flex items-center justify-center gap-1 bg-white border border-gray-200 rounded-full px-3 py-1 shadow-sm group-focus-within:opacity-0 group-focus-within:translate-x-2 transition-all duration-300 shrink-0">
-        <span className="text-[13px] leading-none text-gray-600 font-sans">⌘</span>
-        <span className="text-[11px] font-bold text-gray-600 uppercase">K</span>
+      <kbd className="hidden sm:flex items-center justify-center gap-1 bg-white/10 border border-white/10 rounded-full px-3 py-1 group-focus-within:opacity-0 group-focus-within:translate-x-2 transition-all duration-300 shrink-0">
+        <span className="text-[13px] leading-none text-gray-400 font-sans">⌘</span>
+        <span className="text-[11px] font-bold text-gray-400 uppercase">K</span>
       </kbd>
     </form>
   )
@@ -80,35 +80,34 @@ export default function Topbar() {
   ]
 
   return (
-    <div className="w-full bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-xl z-50 sticky top-0">
+    <div className="w-full bg-slate-950/90 backdrop-blur-xl border-b border-white/5 px-6 py-3 flex items-center justify-between shadow-2xl z-50 sticky top-0">
 
       {/* SEARCH BAR WITH SUSPENSE */}
-      <Suspense fallback={<div className="w-full max-w-xl bg-gray-50 rounded-full px-5 py-2.5 h-10 animate-pulse" />}>
+      <Suspense fallback={<div className="w-full max-w-xl bg-white/5 rounded-full px-5 py-2.5 h-10 animate-pulse" />}>
         <SearchInput />
       </Suspense>
 
       {/* TABS SECTION */}
-      <nav className="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100 mx-4">
+      <nav className="flex items-center bg-white/5 p-1 rounded-xl border border-white/10 mx-4">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href
           return (
             <Link
               key={tab.name}
               href={tab.href}
-              className={`relative px-4 py-1.5 text-sm font-medium transition-all duration-300 ease-out rounded-lg
+              className={`relative px-4 py-1.5 text-sm font-bold transition-all duration-300 ease-out rounded-lg
                 ${isActive 
-                  ? 'text-blue-600 bg-white shadow-sm ring-1 ring-black/5' 
+                  ? 'text-white bg-white/10 shadow-lg ring-1 ring-white/20' 
                   : tab.name === "FYP"
-                    ? 'text-gray-900 group/fyp'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100/50'
+                    ? 'text-white/90 group/fyp'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
             >
               {tab.name === "FYP" && !isActive && (
                 <>
                   <div className="absolute -inset-[1px] rounded-lg p-[1.5px] bg-linear-to-r from-red-500 via-blue-500 to-purple-500 -z-10 opacity-70 group-hover/fyp:opacity-100 transition-all duration-300">
-                    <div className="absolute inset-[1px] bg-white rounded-[7px]" />
+                    <div className="absolute inset-[1px] bg-slate-950 rounded-[7px]" />
                   </div>
-                  <div className="absolute -inset-[1px] rounded-lg shadow-[0_0_12px_-2px_rgba(37,99,235,0.2)] group-hover/fyp:shadow-[0_0_18px_-2px_rgba(168,85,247,0.5)] transition-all duration-300 -z-20" />
                 </>
               )}
               <span className="relative z-10 flex items-center gap-1.5">
@@ -116,7 +115,7 @@ export default function Topbar() {
                 {tab.name === "FYP" && <span className="text-[10px] animate-bounce">✨</span>}
               </span>
               {isActive && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.6)]"></span>
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
               )}
             </Link>
           )
@@ -132,11 +131,11 @@ export default function Topbar() {
           onMouseEnter={() => setProfileOpen(true)}
           onMouseLeave={() => setProfileOpen(false)}
         >
-          <button className="group flex items-center gap-2.5 p-1 pr-3 rounded-full border border-transparent hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm transition-all duration-300 ease-out">
-            <div className="w-8 h-8 rounded-full bg-[#1b2533] text-white flex items-center justify-center text-sm font-bold shadow-sm ring-1 ring-white group-hover:scale-105 transition-all duration-300">
+          <button className="group flex items-center gap-2.5 p-1 pr-3 rounded-full border border-transparent hover:border-white/10 hover:bg-white/5 transition-all duration-300 ease-out">
+            <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center text-sm font-bold shadow-sm ring-1 ring-white group-hover:scale-105 transition-all duration-300">
               {name ? name.charAt(0).toUpperCase() : "U"}
             </div>
-            <span className="text-sm font-semibold text-gray-900 tracking-tight transition-colors duration-300">
+            <span className="text-sm font-bold text-white tracking-tight transition-colors duration-300">
               {name || "User"}
             </span>
           </button>
