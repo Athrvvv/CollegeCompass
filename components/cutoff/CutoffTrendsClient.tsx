@@ -299,7 +299,7 @@ export default function CutoffTrendsClient() {
 
   // --- Renderers ---
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#f8fafc] overflow-y-auto custom-scrollbar relative">
+    <div className="w-full h-full bg-[#f8fafc] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar">
       <AnimatePresence mode="wait">
         
         {viewState === "SEARCH" && (
@@ -308,43 +308,107 @@ export default function CutoffTrendsClient() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center justify-center min-h-full p-8"
+            className="flex flex-col items-center justify-start min-h-full p-6 md:p-12 relative"
           >
-            <div className="max-w-3xl w-full text-center mb-12">
-              <div className="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-500/10 rotate-3 cursor-default">
-                 <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                 </svg>
-              </div>
-              <h1 className="text-5xl font-black text-slate-900 tracking-tightest mb-4">Cutoff Control Center</h1>
-              <p className="text-slate-500 font-bold text-lg max-w-xl mx-auto">Analyze historical trends or compare multiple institutions side-by-side in one unified dashboard.</p>
+            {/* Background Effects */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-4xl">
+              <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] bg-indigo-500/10 blur-[120px] rounded-full" />
+              <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-sky-500/10 blur-[100px] rounded-full" />
             </div>
 
-            <div className="w-full max-w-2xl relative">
-                <input
-                    type="text"
-                    placeholder="Search for an institution..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full pl-16 pr-6 py-5 bg-white border-2 border-slate-100 rounded-4xl text-lg font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 shadow-xl"
-                />
+            <div className="max-w-4xl w-full text-center mt-10 md:mt-20 mb-10 relative z-10">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-indigo-100 shadow-sm mb-8">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600">Premium Precision Engine</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tightest mb-6">Cutoff Control Center</h1>
+              <p className="text-slate-500 font-bold text-lg max-w-2xl mx-auto leading-relaxed">
+                Harness advanced AI ensembles to analyze historical admission trends, forecast market volatility, and strategize your counseling rounds.
+              </p>
+            </div>
+
+            <div className="w-full max-w-3xl relative z-20 mb-16">
+                <div className="absolute -inset-2 bg-linear-to-r from-indigo-500 via-sky-500 to-indigo-500 rounded-[2.5rem] blur-xl opacity-20 transition duration-1000 group-hover:duration-500 animate-gradient" />
+                <div className="relative">
+                  <input
+                      type="text"
+                      placeholder="Search for any institution..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="w-full pl-7 pr-7 py-6 bg-white/95 backdrop-blur-md border-2 border-white/50 rounded-4xl text-lg font-black text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-2xl transition-all"
+                  />
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
+                    {isSearching ? (
+                      <div className="w-5 h-5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+
                 <AnimatePresence>
                     {searchResults.length > 0 && (
-                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute top-14 left-0 right-0 pt-8 pb-4 bg-white border border-slate-100 rounded-b-[2rem] shadow-2xl z-10 overflow-hidden">
+                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute top-[110%] left-0 right-0 py-4 bg-white/95 backdrop-blur-2xl border border-white rounded-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] z-50 overflow-y-auto custom-scrollbar max-h-[350px]">
                             {searchResults.map((college) => (
-                                <button key={college.college_id} onClick={() => handleSelectCollege(college)} className="w-full text-left px-6 py-4 hover:bg-slate-50 flex items-center gap-4 group">
-                                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center font-black text-indigo-300">
-                                      {college.logo_url ? <img src={college.logo_url} className="w-full h-full object-contain p-1" /> : college.college_name[0]}
+                                <button key={college.college_id} onClick={() => handleSelectCollege(college)} className="w-full text-left px-6 py-4 hover:bg-slate-50/80 flex items-center gap-5 group transition-colors">
+                                    <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center font-black text-slate-400 overflow-hidden shadow-inner group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                                      {college.logo_url ? <img src={college.logo_url} className="w-full h-full object-contain p-2" /> : college.college_name[0]}
                                     </div>
-                                    <div className="flex-1 truncate">
-                                      <span className="block text-sm font-black text-slate-900 group-hover:text-indigo-600 truncate">{college.college_name}</span>
-                                      <span className="text-xs font-bold text-slate-400">{college.city}, {college.state}</span>
+                                    <div className="flex-1 min-w-0">
+                                      <span className="block text-sm font-black text-slate-900 group-hover:text-indigo-600 truncate transition-colors">{college.college_name}</span>
+                                      <span className="text-xs font-bold text-slate-500 truncate">{college.city}, {college.state}</span>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-white opacity-0 group-hover:opacity-100 shadow-sm flex items-center justify-center transform translate-x-4 group-hover:translate-x-0 transition-all text-indigo-600">
+                                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                                     </div>
                                 </button>
                             ))}
                         </motion.div>
                     )}
                 </AnimatePresence>
+                
+                {/* Trending Tags */}
+                <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">Trending:</span>
+                  {["IIT Bombay", "NIT Trichy", "BITS Pilani", "Delhi Technological University"].map((trend) => (
+                    <button 
+                      key={trend}
+                      onClick={() => handleSearch(trend)}
+                      className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 shadow-sm hover:shadow-md transition-all"
+                    >
+                      {trend}
+                    </button>
+                  ))}
+                </div>
+            </div>
+
+            {/* Platform Capabilities Grid */}
+            <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 mt-auto pt-10">
+              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.644.322a6 6 0 01-3.86.517l-2.387-.477a2 2 0 00-1.022.547l-1.16 1.16a2 2 0 00.439 3.28 12.06 12.06 0 0013.882 0 2 2 0 00.439-3.28l-1.16-1.16zM15 8h.01M12 14l9-5-9-5-9 5 9 5z" /></svg>
+                </div>
+                <h3 className="text-lg font-black text-slate-900 mb-3">AI Prediction Ensembles</h3>
+                <p className="text-sm font-medium text-slate-500 leading-relaxed">Leverage multiple machine learning models acting in parallel to predict your exact admission probabilities with extreme precision.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                </div>
+                <h3 className="text-lg font-black text-slate-900 mb-3">Market Volatility Radar</h3>
+                <p className="text-sm font-medium text-slate-500 leading-relaxed">Automatically detect anomalous cutoff shifts, historical rank drift, and compute dynamic stability scores for every branch.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h3 className="text-lg font-black text-slate-900 mb-3">Strategic Round Planner</h3>
+                <p className="text-sm font-medium text-slate-500 leading-relaxed">Get brutally honest, actionable maneuver plans and recommended counseling rounds crafted specifically for your rank.</p>
+              </div>
             </div>
           </motion.div>
         )}

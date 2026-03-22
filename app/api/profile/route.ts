@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { firstName, middleName, lastName, phone, email, qualification, exams } = body;
+    const { firstName, middleName, lastName, phone, email, qualification, exams, userRank, category, gender, stateOfEligibility, pwdStatus } = body;
 
     const sql = neon(process.env.DATABASE_URL!);
 
@@ -26,6 +26,11 @@ export async function POST(req: NextRequest) {
         email, 
         education_qualification, 
         exams_appeared, 
+        user_rank,
+        category,
+        gender,
+        state_of_eligibility,
+        pwd_status,
         onboarding_completed,
         updated_at
       ) 
@@ -38,6 +43,11 @@ export async function POST(req: NextRequest) {
         ${email}, 
         ${qualification}, 
         ${JSON.stringify(exams)},
+        ${userRank || null},
+        ${category || null},
+        ${gender || null},
+        ${stateOfEligibility || null},
+        ${pwdStatus || false},
         TRUE,
         NOW()
       )
@@ -50,6 +60,11 @@ export async function POST(req: NextRequest) {
         email = EXCLUDED.email,
         education_qualification = EXCLUDED.education_qualification,
         exams_appeared = EXCLUDED.exams_appeared,
+        user_rank = EXCLUDED.user_rank,
+        category = EXCLUDED.category,
+        gender = EXCLUDED.gender,
+        state_of_eligibility = EXCLUDED.state_of_eligibility,
+        pwd_status = EXCLUDED.pwd_status,
         onboarding_completed = TRUE,
         updated_at = NOW();
     `;

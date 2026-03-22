@@ -293,28 +293,42 @@ export default function DashboardClient({
   ] as const
 
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden">
+    <div className="flex w-full h-full relative overflow-hidden">
         
       {/* MAIN CONTENT Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-white">
         
         {/* Subtabs Switcher */}
-        <div className="px-6 py-4 border-b border-gray-50 bg-white/80 backdrop-blur-md sticky top-0 z-10">
-          <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-[20px] w-fit border border-gray-100">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-[16px] text-xs font-black uppercase tracking-widest transition-all duration-300 ${
-                  activeTab === tab.id 
-                    ? 'bg-white text-indigo-600 shadow-[0_8px_20px_-4px_rgba(79,70,229,0.15)] ring-1 ring-black/5' 
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100/50'
-                }`}
-              >
-                <span className="text-base">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
+        <div className="px-4 md:px-8 py-5 border-b border-gray-100/60 bg-white/70 backdrop-blur-2xl sticky top-0 z-20 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center gap-1 md:gap-2 p-1.5 bg-slate-50/80 rounded-2xl md:rounded-[20px] w-fit max-w-full overflow-x-auto no-scrollbar border border-slate-200/60 shadow-inner">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative shrink-0 flex items-center gap-2 md:gap-3 px-4 md:px-7 py-3 md:py-3.5 rounded-xl md:rounded-[16px] text-[10px] md:text-xs font-black uppercase tracking-[0.15em] transition-colors duration-300 z-10 group ${
+                    isActive 
+                      ? 'text-indigo-600' 
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabDashboard"
+                      className="absolute inset-0 bg-white rounded-xl md:rounded-[16px] shadow-[0_8px_20px_-6px_rgba(79,70,229,0.15)] ring-1 ring-slate-900/5 z-0"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <div className={`relative z-10 flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-slate-100/50 shadow-xs transition-all duration-300 ${isActive ? 'bg-indigo-50/80 shadow-indigo-100 ring-1 ring-indigo-100 scale-110' : 'group-hover:scale-105 group-hover:bg-slate-200/50'}`}>
+                    <span className={`text-sm md:text-base leading-none transition-all duration-300 ${isActive ? 'drop-shadow-sm' : 'grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100'}`}>
+                      {tab.icon}
+                    </span>
+                  </div>
+                  <span className="relative z-10 mt-0.5">{tab.label}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
 

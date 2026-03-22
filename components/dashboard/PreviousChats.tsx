@@ -20,8 +20,9 @@ export default function PreviousChats({ chats, loading, onViewTable }: Props) {
         {chats.map((chat) => (
           <motion.div
             key={chat.id}
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
             className={`flex flex-col w-full ${chat.sender === "user" ? "items-end" : "items-start"}`}
           >
             

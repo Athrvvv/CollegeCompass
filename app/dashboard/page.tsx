@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth/server"
 import { getColleges } from "@/app/actions/getColleges"
 
-import ChatSidebar from "@/components/dashboard/ChatSidebar"
 import DashboardClient from "@/components/dashboard/DashboardClient"
 
 export const dynamic = "force-dynamic"

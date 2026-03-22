@@ -48,7 +48,7 @@ export default function ChatSidebar() {
       const { data } = await authClient.getSession()
       const sessionid = data?.session?.id || "default_session"
 
-      const response = await fetch("https://nlqt-vsetence-transformer.onrender.com/query", {
+      const response = await fetch("https://nlqt-service.onrender.com/query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,59 +106,125 @@ export default function ChatSidebar() {
       
       {/* MAIN SIDEBAR CONTENT */}
       <aside className="w-72 text-slate-200 flex flex-col px-5 py-6 overflow-y-auto h-full relative z-50 bg-slate-950/80 backdrop-blur-xl shadow-2xl custom-scrollbar">
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col h-full relative">
 
-          <div className="mb-8">
-            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-1">
-              AI Assistant
-            </h2>
-            <p className="text-lg font-semibold text-white">
-              How can I help you today?
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="relative group mb-8">
-            <div className="absolute -inset-0.5 bg-linear-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-20 group-focus-within:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative flex items-center bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 focus-within:border-indigo-500/50 transition-all">
-              <input
-                type="text"
-                placeholder="Ask about colleges..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                disabled={loading}
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-600 disabled:opacity-50"
-              />
-              <button 
-                type="submit" 
-                disabled={loading || !message.trim()}
-                className="ml-2 text-indigo-400 hover:text-indigo-300 disabled:opacity-30 transition-colors"
+          <AnimatePresence mode="wait">
+            {chats.length === 0 ? (
+              <motion.div
+                key="empty-state"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="flex flex-col items-center justify-center flex-1 w-full text-center mt-[-10%]"
               >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </form>
+                <div className="w-16 h-16 rounded-[24px] bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(99,102,241,0.15)] border border-indigo-500/20 relative group">
+                  <span className="text-3xl relative z-10 group-hover:scale-110 transition-transform duration-500">✨</span>
+                  <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-20 rounded-full animate-pulse [animation-duration:3s]" />
+                </div>
+                
+                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 mb-3 drop-shadow-sm">
+                  College Compass AI
+                </h2>
+                <p className="text-2xl font-black text-white tracking-tight leading-tight mb-8 drop-shadow-md">
+                  How can I help<br/>you today?
+                </p>
 
-          {/* PREVIOUS CHATS */}
-          <div className="flex-1 overflow-hidden flex flex-col">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-4 px-1">
-              Recent Activity
-            </h3>
-            <PreviousChats 
-              chats={chats} 
-              loading={loading}
-              onViewTable={(colleges) => {
-                setTableColleges(colleges)
-                setTableSearch("")
-                setCurrentPage(1)
-              }}
-            />
-          </div>
+                <div className="w-full relative group">
+                  <div className="absolute -inset-1 bg-linear-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-2xl blur-lg opacity-30 group-focus-within:opacity-60 transition duration-1000 group-hover:duration-500" />
+                  <form onSubmit={handleSubmit} className="relative flex items-center bg-slate-900/90 border border-slate-800 rounded-2xl px-5 py-4 focus-within:border-indigo-500/50 focus-within:bg-slate-900 transition-all shadow-xl">
+                    <input
+                      type="text"
+                      placeholder="Ask me about any college..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      disabled={loading}
+                      className="flex-1 min-w-0 bg-transparent text-[13px] font-medium outline-none placeholder:text-slate-500 disabled:opacity-50 text-white"
+                    />
+                    <button 
+                      type="submit" 
+                      disabled={loading || !message.trim()}
+                      className="ml-3 w-8 h-8 shrink-0 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white disabled:opacity-30 transition-all group-focus-within:bg-indigo-500 group-focus-within:text-white"
+                    >
+                      {loading ? (
+                        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  </form>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="chat-state"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="flex flex-col h-full w-full"
+              >
+                {/* Compact Header */}
+                <div className="shrink-0 flex items-center gap-3 pb-4 border-b border-slate-800/50 mb-4 z-10 sticky top-0 bg-slate-950/80 backdrop-blur-xl">
+                  <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/20 shadow-inner">
+                    <span className="text-base">✨</span>
+                  </div>
+                  <div>
+                    <h2 className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-0.5">
+                      College Compass
+                    </h2>
+                    <p className="text-sm font-bold text-white tracking-wide">
+                      AI Assistant
+                    </p>
+                  </div>
+                </div>
+
+                {/* PREVIOUS CHATS */}
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <PreviousChats 
+                    chats={chats} 
+                    loading={loading}
+                    onViewTable={(colleges) => {
+                       setTableColleges(colleges)
+                       setTableSearch("")
+                       setCurrentPage(1)
+                    }}
+                  />
+                </div>
+
+                {/* Input at the bottom */}
+                <div className="shrink-0 pt-4 pb-2 bg-slate-950/90 backdrop-blur-xl z-20 sticky bottom-0 border-t border-slate-900">
+                  <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-10 group-focus-within:opacity-30 transition duration-1000 group-hover:duration-500" />
+                    <form onSubmit={handleSubmit} className="relative flex items-center bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 focus-within:border-indigo-500/50 transition-all shadow-lg">
+                      <input
+                        type="text"
+                        placeholder="Follow up..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        disabled={loading}
+                        className="flex-1 min-w-0 bg-transparent text-[13px] font-medium outline-none placeholder:text-slate-500 disabled:opacity-50 text-white"
+                      />
+                      <button 
+                        type="submit" 
+                        disabled={loading || !message.trim()}
+                        className="ml-2 w-8 h-8 shrink-0 rounded-[10px] flex items-center justify-center bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white disabled:opacity-30 transition-all focus:bg-indigo-500 focus:text-white group-focus-within:bg-indigo-500 group-focus-within:text-white"
+                      >
+                        {loading ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
       </aside>

@@ -79,6 +79,10 @@ body {
   100% { transform: translateX(100%); }
 }
 
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }

@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import { NotebookProvider } from "@/context/NotebookContext";
+import { ComparisonProvider } from "@/context/ComparisonContext";
 
 export default function RootLayout({
   children,
@@ -31,7 +32,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <NotebookProvider>
-          {children}
+          <ComparisonProvider>
+            {children}
+          </ComparisonProvider>
         </NotebookProvider>
       </body>
     </html>

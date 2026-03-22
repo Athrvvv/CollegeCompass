@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { useNotebook } from "@/context/NotebookContext"
+import { useComparison } from "@/context/ComparisonContext"
 
 type TabType = "Info" | "Courses & Fees" | "CutOff" | "Placement" | "Reviews" | "Location"
 
@@ -15,7 +17,44 @@ export default function CollegeDetailClient({
   const [activeTab, setActiveTab] = useState<TabType>("Info")
   const [imgSrc, setImgSrc] = useState(college.logo_url || "/college-placeholder.png")
 
+  const { addNote, isInNotebook } = useNotebook()
+  const { addCollegeToCompare, isCollegeInComparison } = useComparison()
+
+  const isSaved = isInNotebook(college.college_id.toString())
+  const isCompared = isCollegeInComparison(college.college_id)
+
   const TABS: TabType[] = ["Info", "Courses & Fees", "CutOff", "Placement", "Reviews", "Location"]
+
+  const handleAddToNotes = () => {
+    if (isSaved) return
+    addNote({
+      note_id: college.college_id.toString(),
+      note_name: college.college_name,
+      remark: `Saved from college detail page. ${college.city}, ${college.state}`,
+      data: [{
+        college_id: college.college_id,
+        college_name: college.college_name,
+        city: college.city,
+        state: college.state,
+        rating: college.rating,
+        highest_package: college.highest_package
+      }]
+    })
+  }
+
+  const handleAddToCompare = () => {
+    if (isCompared) return
+    const success = addCollegeToCompare({
+      college_id: college.college_id,
+      college_name: college.college_name,
+      logo_url: college.logo_url,
+      city: college.city,
+      state: college.state
+    })
+    if (!success) {
+      alert("Comparison list is full (max 4 colleges).")
+    }
+  }
 
   return (
     <div className="flex flex-col lg:flex-row w-full h-full bg-white relative">
@@ -70,12 +109,49 @@ export default function CollegeDetailClient({
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 mt-12 mb-2 lg:mb-0">
-          <button className="flex-1 border border-white/20 bg-transparent hover:bg-white/10 text-white py-3.5 px-4 rounded-[12px] text-sm font-semibold transition-all duration-200">
-            Compare this College
+        <div className="flex flex-col sm:flex-row gap-4 mt-12 mb-2 lg:mb-0">
+          <button 
+            onClick={handleAddToCompare}
+            className={`flex-1 flex items-center justify-center gap-2 group relative overflow-hidden py-4 px-6 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+              isCompared 
+                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' 
+                : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white shadow-xl shadow-black/20'
+            }`}
+          >
+            <svg 
+              className={`w-4 h-4 transition-transform duration-500 ${isCompared ? 'rotate-0' : 'group-hover:rotate-12'}`} 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span>{isCompared ? 'In Comparison' : 'Compare College'}</span>
+            
+            {/* Hover Shine Effect */}
+            {!isCompared && (
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+            )}
           </button>
-          <button className="flex-1 border border-white/20 bg-transparent hover:bg-white/10 text-white py-3.5 px-4 rounded-[12px] text-sm font-semibold transition-all duration-200">
-            Add this to the Notes
+
+          <button 
+            onClick={handleAddToNotes}
+            className={`flex-1 flex items-center justify-center gap-2 group relative overflow-hidden py-4 px-6 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+              isSaved 
+                ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30' 
+                : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white shadow-xl shadow-black/20'
+            }`}
+          >
+            <svg 
+              className={`w-4 h-4 transition-all duration-500 ${isSaved ? 'scale-110 fill-emerald-300/20' : 'group-hover:-translate-y-0.5'}`} 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            <span>{isSaved ? 'Saved in Notes' : 'Add to Notes'}</span>
+            
+            {/* Hover Shine Effect */}
+            {!isSaved && (
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+            )}
           </button>
         </div>
       </div>
