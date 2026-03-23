@@ -124,11 +124,11 @@ export async function getCollegeCutoffsTrends(collegeId: number): Promise<Colleg
         return course;
     });
 
-    return {
+    return JSON.parse(JSON.stringify({
       college_id: collegeId,
       college_name: collegeName,
       courses: courses
-    };
+    }));
 
   } catch (error) {
     console.error("Failed to fetch college cutoff trends:", error);

@@ -56,7 +56,7 @@ export async function getCutoffs(search: string = "", page: number = 1, limit: n
          OR e.name ILIKE ${searchPattern}
     `;
 
-    return {
+    return JSON.parse(JSON.stringify({
       data: data.map(item => ({
         ...item,
         id: `${item.college_id}-${item.course_id}-${item.specialization_id || "none"}-${item.exam_id}-${item.category}`
@@ -64,7 +64,7 @@ export async function getCutoffs(search: string = "", page: number = 1, limit: n
       totalCount: Number(countResult[0]?.count) || 0,
       totalPages: Math.ceil((Number(countResult[0]?.count) || 0) / limit),
       currentPage: page
-    };
+    }));
   } catch (error) {
     console.error("Failed to fetch cutoffs:", error);
     return { data: [], totalCount: 0, totalPages: 0, currentPage: 1 };

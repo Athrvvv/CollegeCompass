@@ -53,7 +53,15 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
       setLoadingHistory(true)
       getAdvisorMessages(activeSessionId)
         .then(msgs => {
-          setMessages(msgs.map((m: any) => ({ role: m.role, content: m.content })))
+          console.log("Loaded msgs:", msgs)
+          if (Array.isArray(msgs)) {
+             setMessages(msgs.map((m: any) => ({ role: m.role, content: m.content })))
+          } else {
+             console.error("Not an array:", msgs)
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching msgs:", err)
         })
         .finally(() => setLoadingHistory(false))
     } else {
@@ -104,10 +112,10 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-68px)] overflow-hidden">
       
       {/* LEFT: FLOW CHART AREA */}
-      <div className="flex-1 overflow-auto bg-[#f8fafc] p-4 lg:p-12 border-r border-slate-200">
+      <div className="w-full lg:w-[40%] xl:w-[35%] overflow-auto bg-[#f8fafc] p-4 lg:p-8 border-r border-slate-200">
         <div className="max-w-5xl mx-auto space-y-16">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
@@ -320,35 +328,35 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
       </div>
 
       {/* RIGHT: CHATBOT AREA */}
-      <div className="w-full lg:w-[550px] flex bg-white border-l border-slate-200 shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.05)]">
+      <div className="flex-1 flex w-full bg-white shadow-[-20px_0_40px_-15px_rgba(0,0,0,0.05)] relative z-10 overflow-hidden">
         
         {/* Chat History Drawer/Sidebar */}
-        <div className="w-[180px] border-r border-slate-100 flex flex-col bg-slate-50/50">
-          <div className="p-4 border-b border-slate-100">
+        <div className="w-[220px] shrink-0 border-r border-slate-100 flex flex-col bg-slate-50/50">
+          <div className="p-5 border-b border-slate-100/60 bg-white/50 backdrop-blur-sm">
             <button 
               onClick={handleNewChat}
-              className="w-full py-2 px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-blue-300 transition-all flex items-center justify-center gap-2 shadow-sm"
+              className="w-full py-2.5 px-4 bg-white border border-slate-200 rounded-xl text-[13px] font-bold text-slate-700 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
               </svg>
               New Chat
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            <div className="px-2 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">History</div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
+            <div className="px-2 pb-2 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">History</div>
             {sessions.map(s => (
               <button
                 key={s.id}
                 onClick={() => setActiveSessionId(s.id)}
-                className={`w-full text-left p-2.5 rounded-lg transition-all group ${
+                className={`w-full text-left p-3 rounded-xl transition-all group border ${
                   activeSessionId === s.id 
-                    ? 'bg-blue-50 text-blue-700' 
-                    : 'text-slate-500 hover:bg-slate-100'
+                    ? 'bg-white border-blue-100 text-blue-700 shadow-sm shadow-blue-500/5' 
+                    : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100/50'
                 }`}
               >
-                <div className="text-[11px] font-bold truncate">{s.title || "New Chat"}</div>
-                <div className="text-[9px] opacity-60 mt-0.5">{new Date(s.updated_at).toLocaleDateString()}</div>
+                <div className="text-xs font-bold truncate">{s.title || "New Chat"}</div>
+                <div className="text-[10px] opacity-60 mt-1">{new Date(s.updated_at).toLocaleDateString()}</div>
               </button>
             ))}
           </div>
@@ -357,23 +365,28 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Chat Header */}
-          <div className="p-5 border-b border-slate-100 bg-white flex items-center gap-3">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md">
-               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-               </svg>
-            </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-sm">AI Advisor</h3>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Personalized guidance</span>
+          <div className="py-4 px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md z-20 flex items-center justify-between sticky top-0 shadow-sm shadow-slate-200/20">
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 bg-linear-to-br from-blue-500 to-indigo-600 rounded-[14px] flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                 </svg>
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-base">AI Advisor</h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Personalized guidance</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-50/20">
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-slate-50/50 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50/40 via-transparent to-transparent">
             {loadingHistory ? (
                <div className="flex items-center justify-center h-full">
                  <div className="w-6 h-6 border-3 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
@@ -391,32 +404,37 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                     key={i}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}
                   >
-                    <div className={`max-w-[90%] rounded-2xl shadow-sm overflow-hidden ${
+                    <div className={`max-w-[90%] md:max-w-[80%] rounded-3xl shadow-sm ${
                       msg.role === 'user' 
-                        ? 'bg-blue-600 text-white rounded-br-none font-medium p-3.5 text-xs' 
-                        : 'bg-white border border-slate-100 text-slate-800 rounded-bl-none'
+                        ? 'bg-linear-to-br from-blue-600 to-indigo-600 text-white rounded-br-sm font-medium p-4 text-[15px] shadow-blue-500/20 shadow-md' 
+                        : 'bg-white border border-slate-100/60 text-slate-800 rounded-bl-sm shadow-xl shadow-slate-200/20 backdrop-blur-xl'
                     }`}>
                       {msg.role === 'model' ? (
                         <div className="flex flex-col">
-                          <div className="bg-slate-50/80 px-3 py-1.5 border-b border-slate-100 flex items-center justify-between">
-                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Guidance</span>
+                          <div className="bg-slate-50/50 px-4 py-3 border-b border-slate-100/60 flex items-center justify-between rounded-t-3xl">
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded-full bg-linear-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-inner">
+                                <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                              </div>
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">AI Guidance</span>
+                            </div>
                              {!isInNotebook(getSafeMessageId(msg.content)) ? (
                                <button 
                                  onClick={() => {
                                    setPendingNoteContent(msg.content);
                                    setIsRemarkModalOpen(true);
                                  }}
-                                 className="text-[9px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                                 className="text-[10px] font-bold text-slate-600 bg-white border border-slate-200 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 px-2 py-1 rounded-md flex items-center gap-1 transition-all"
                                >
-                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                  </svg>
                                  Save
                                </button>
                              ) : (
-                               <span className="text-[9px] font-bold text-green-600 flex items-center gap-1">
+                               <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md flex items-center gap-1 border border-green-100">
                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                    <path d="M5 13l4 4L19 7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                                  </svg>
@@ -424,7 +442,7 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                                </span>
                              )}
                           </div>
-                          <div className="p-3.5 prose prose-xs prose-slate max-w-none prose-headings:text-slate-900 prose-ul:list-disc prose-ol:list-decimal prose-p:leading-relaxed prose-headings:mb-2 prose-headings:mt-4 first:prose-headings:mt-0 prose-ul:my-2 prose-li:my-0 pb-1">
+                          <div className="p-5 prose prose-sm md:prose-base prose-slate max-w-none prose-headings:text-slate-900 prose-ul:list-disc prose-ol:list-decimal prose-p:leading-relaxed prose-headings:mb-3 prose-headings:mt-5 first:prose-headings:mt-0 prose-ul:my-3 prose-li:my-1 pb-2">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {msg.content}
                             </ReactMarkdown>
@@ -452,27 +470,31 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
           </div>
 
           {/* Input */}
-          <div className="p-5 bg-white border-t border-slate-100">
-            <form onSubmit={handleSend} className="relative">
-              <input 
-                type="text" 
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask for guidance..."
-                className="w-full pl-5 pr-14 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder-slate-400"
-              />
-              <button 
-                type="submit"
-                disabled={!input.trim() || loading}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white rounded-lg flex items-center justify-center transition-all shadow-md shadow-blue-500/10 active:scale-95"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                </svg>
-              </button>
+          <div className="p-4 md:p-6 bg-white/80 backdrop-blur-xl border-t border-slate-100 z-20 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+            <form onSubmit={handleSend} className="relative max-w-4xl mx-auto flex gap-3">
+              <div className="relative flex-1">
+                <input 
+                  type="text" 
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask for guidance or explore a career path..."
+                  className="w-full pl-6 pr-16 py-4 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/15 focus:border-blue-500 focus:bg-white transition-all text-[15px] font-medium placeholder-slate-400 shadow-inner"
+                />
+                <button 
+                  type="submit"
+                  disabled={!input.trim() || loading}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-linear-to-br from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 text-white rounded-[14px] flex items-center justify-center transition-all shadow-lg shadow-blue-500/20 active:scale-95 group"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-0.5 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                  </svg>
+                </button>
+              </div>
             </form>
-            <p className="text-center text-[9px] text-slate-400 mt-3 font-bold uppercase tracking-widest">
-              AI Advisor guidance is personalized.
+            <p className="text-center text-[10px] text-slate-400 mt-4 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-50" />
+              AI Advisor guidance is personalized to your profile
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 opacity-50" />
             </p>
           </div>
         </div>

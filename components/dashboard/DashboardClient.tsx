@@ -201,6 +201,11 @@ export default function DashboardClient({
     return discoveryMeta.exams.filter(e => e.name.toLowerCase().includes(q.toLowerCase()))
   }, [discoveryMeta, q])
 
+  const filteredCourses = useMemo(() => {
+    if (!discoveryMeta) return []
+    return discoveryMeta.courses.filter(c => c.name.toLowerCase().includes(q.toLowerCase()))
+  }, [discoveryMeta, q])
+
   // Reset pagination when search or filters change
   useEffect(() => {
     setCollegePage(1)
@@ -412,7 +417,7 @@ export default function DashboardClient({
                       ) : (
                         <>
                           <DashboardGrid>
-                            {getPaginatedItems(discoveryMeta?.streams || [], streamPage).map((stream) => (
+                            {getPaginatedItems(filteredStreams, streamPage).map((stream) => (
                               <DiscoveryCard
                                 key={stream.name}
                                 name={stream.name}
@@ -423,7 +428,7 @@ export default function DashboardClient({
                               />
                             ))}
                           </DashboardGrid>
-                          {renderPagination(discoveryMeta?.streams.length || 0, streamPage, setStreamPage)}
+                          {renderPagination(filteredStreams.length, streamPage, setStreamPage)}
                         </>
                       )}
                     </>
@@ -466,7 +471,7 @@ export default function DashboardClient({
                       ) : (
                         <>
                           <DashboardGrid>
-                            {getPaginatedItems(discoveryMeta?.courses.filter((c: any) => c.name.toLowerCase().includes(q.toLowerCase())) || [], coursePage).map((course) => (
+                            {getPaginatedItems(filteredCourses, coursePage).map((course) => (
                               <DiscoveryCard
                                 key={course.name}
                                 name={course.name}
@@ -479,7 +484,7 @@ export default function DashboardClient({
                               />
                             ))}
                           </DashboardGrid>
-                          {renderPagination(discoveryMeta?.courses.filter((c: any) => c.name.toLowerCase().includes(q.toLowerCase())).length || 0, coursePage, setCoursePage)}
+                          {renderPagination(filteredCourses.length, coursePage, setCoursePage)}
                         </>
                       )}
                     </>
@@ -522,7 +527,7 @@ export default function DashboardClient({
                   ) : (
                     <>
                       <DashboardGrid>
-                        {getPaginatedItems(discoveryMeta?.specializations.filter((s:any) => s.name.toLowerCase().includes(q.toLowerCase())) || [], specPage).map((spec) => (
+                        {getPaginatedItems(filteredSpecs, specPage).map((spec) => (
                           <DiscoveryCard
                             key={spec.name}
                             name={spec.name}
@@ -533,7 +538,7 @@ export default function DashboardClient({
                           />
                         ))}
                       </DashboardGrid>
-                      {renderPagination(discoveryMeta?.specializations.filter((s:any) => s.name.toLowerCase().includes(q.toLowerCase())).length || 0, specPage, setSpecPage)}
+                      {renderPagination(filteredSpecs.length, specPage, setSpecPage)}
                     </>
                   )}
                 </>
@@ -576,7 +581,7 @@ export default function DashboardClient({
                   ) : (
                     <>
                       <DashboardGrid>
-                        {getPaginatedItems(discoveryMeta?.exams.filter((e:any) => e.name.toLowerCase().includes(q.toLowerCase())) || [], examPage).map((exam) => (
+                        {getPaginatedItems(filteredExams, examPage).map((exam) => (
                           <DiscoveryCard
                             key={exam.name}
                             name={exam.name}
@@ -588,7 +593,7 @@ export default function DashboardClient({
                           />
                         ))}
                       </DashboardGrid>
-                      {renderPagination(discoveryMeta?.exams.filter((e:any) => e.name.toLowerCase().includes(q.toLowerCase())).length || 0, examPage, setExamPage)}
+                      {renderPagination(filteredExams.length, examPage, setExamPage)}
                     </>
                   )}
                 </>

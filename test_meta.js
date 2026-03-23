@@ -1,13 +1,9 @@
-"use server";
+require('dotenv').config({path: '.env.local'});
+const { neon } = require('@neondatabase/serverless');
 
-import { neon } from "@neondatabase/serverless";
-
-export async function getDiscoveryMeta() {
-  console.log("getDiscoveryMeta called");
+async function test() {
   try {
-    const sql = neon(process.env.DATABASE_URL!);
-
-    // Fetch unique streams with college counts and top courses
+    const sql = neon(process.env.DATABASE_URL);
     const streams = await sql`
       SELECT 
         s.stream_name as name, 
@@ -30,8 +26,8 @@ export async function getDiscoveryMeta() {
       GROUP BY s.stream_id, s.stream_name
       ORDER BY count DESC, name ASC
     `;
+    console.log("streams:", streams.length);
 
-    // Fetch unique specializations with college counts
     const specializations = await sql`
       SELECT 
         s.specialization_name as name, 
@@ -54,8 +50,8 @@ export async function getDiscoveryMeta() {
       GROUP BY s.specialization_id, s.specialization_name
       ORDER BY count DESC, name ASC
     `;
+    console.log("specializations:", specializations.length);
 
-    // Fetch unique exams with college counts
     const exams = await sql`
       SELECT 
         e.name, 
@@ -65,8 +61,8 @@ export async function getDiscoveryMeta() {
       GROUP BY e.exam_id, e.name
       ORDER BY count DESC, e.name ASC
     `;
+    console.log("exams:", exams.length);
 
-    // Fetch unique courses with college counts and metadata
     const courses = await sql`
       SELECT 
         c.course_name as name,
@@ -81,20 +77,10 @@ export async function getDiscoveryMeta() {
       ORDER BY count DESC, name ASC
       LIMIT 100
     `;
-
-    return JSON.parse(JSON.stringify({
-      streams: streams || [],
-      specializations: specializations || [],
-      exams: exams || [],
-      courses: courses || []
-    }));
-  } catch (error) {
-    console.error("Error in getDiscoveryMeta:", error);
-    return {
-      streams: [],
-      specializations: [],
-      exams: [],
-      courses: []
-    };
+    console.log("courses:", courses.length);
+  } catch (e) {
+    console.error("Error:", e.message);
   }
 }
+
+test();

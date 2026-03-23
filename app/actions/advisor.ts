@@ -24,12 +24,17 @@ export async function getAdvisorChats() {
   if (!session.data?.user) throw new Error("Unauthorized");
 
   const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
+  const result = await sql`
     SELECT id, title, updated_at
     FROM advisor_chats
     WHERE auth_user_id = ${session.data.user.id}
     ORDER BY updated_at DESC
   `;
+  return result.map((row: any) => ({
+    id: row.id,
+    title: row.title,
+    updated_at: new Date(row.updated_at).toISOString()
+  }));
 }
 
 export async function getAdvisorMessages(chatId: string) {
@@ -37,12 +42,17 @@ export async function getAdvisorMessages(chatId: string) {
   if (!session.data?.user) throw new Error("Unauthorized");
 
   const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
+  const result = await sql`
     SELECT role, content, created_at
     FROM advisor_messages
     WHERE chat_id = ${chatId}
     ORDER BY created_at ASC
   `;
+  return result.map((row: any) => ({
+    role: row.role,
+    content: row.content,
+    created_at: new Date(row.created_at).toISOString()
+  }));
 }
 
 export async function saveAdvisorMessage(chatId: string, role: string, content: string) {
@@ -71,9 +81,17 @@ export async function getAdvisorResponse(message: string, chatId?: string) {
   try {
     const sql = neon(process.env.DATABASE_URL!);
     
-    // Fetch profile for context
+    // Fetch profile for context - updated with requested fields
     const profile = await sql`
-      SELECT first_name, education_qualification, exams_appeared
+      SELECT 
+        first_name, 
+        education_qualification, 
+        exams_appeared,
+        user_rank,
+        category,
+        gender,
+        state_of_eligibility,
+        pwd_status
       FROM user_profiles 
       WHERE auth_user_id = ${session.data.user.id} 
       LIMIT 1
@@ -86,7 +104,7 @@ export async function getAdvisorResponse(message: string, chatId?: string) {
     if (chatId) {
       const messages = await getAdvisorMessages(chatId);
       history = messages.map((m: any) => ({
-        role: m.role,
+        role: m.role === "user" ? "user" : "model",
         parts: [{ text: m.content }]
       }));
     }
@@ -99,6 +117,11 @@ export async function getAdvisorResponse(message: string, chatId?: string) {
       - Name: ${userProfile.first_name || "Student"}
       - Current Qualification: ${userProfile.education_qualification || "Not specified"}
       - Exams Appeared: ${JSON.stringify(userProfile.exams_appeared || [])}
+      - Primary Rank: ${userProfile.user_rank || "Not specified"}
+      - Category: ${userProfile.category || "General"}
+      - Gender: ${userProfile.gender || "Not specified"}
+      - Home State: ${userProfile.state_of_eligibility || "Not specified"}
+      - PwD Status: ${userProfile.pwd_status ? "Yes" : "No"}
 
       CORE PURPOSE:
       The user is at CollegeCompass to explore colleges and careers. Help them find a direction and recommend exploring relevant sections on the website.
@@ -128,7 +151,7 @@ export async function getAdvisorResponse(message: string, chatId?: string) {
     `;
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash", 
       systemInstruction: systemPrompt 
     });
 

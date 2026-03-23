@@ -1,3 +1,4 @@
+import Topbar from "@/components/dashboard/Topbar"
 import AdvisorClient from "./AdvisorClient"
 import { neon } from "@neondatabase/serverless"
 import { getAdvisorChats } from "@/app/actions/advisor"
@@ -19,11 +20,15 @@ export default async function AdvisorPage() {
   const initialChats = await getAdvisorChats().catch(() => []);
 
   return (
-    <AdvisorClient 
-      initialExams={exams} 
-      initialCourses={courses} 
-      initialStreams={streams} 
-      initialChats={initialChats}
-    />
+    <div className="flex flex-col min-h-[calc(100vh-68px)] bg-[#f8fafc] text-slate-900 font-sans">
+      <main className="flex-1 w-full bg-white">
+        <AdvisorClient 
+          initialExams={exams} 
+          initialCourses={courses} 
+          initialStreams={streams} 
+          initialChats={initialChats}
+        />
+      </main>
+    </div>
   )
 }

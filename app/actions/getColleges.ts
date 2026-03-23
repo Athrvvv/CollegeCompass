@@ -42,6 +42,6 @@ export async function getColleges() {
     ORDER BY c.college_id
   `;
 
-  return data;
+  return JSON.parse(JSON.stringify(data));
 
 }
