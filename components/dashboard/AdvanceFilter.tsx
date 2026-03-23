@@ -39,7 +39,7 @@ export default function AdvanceFilter({
   availableSpecializations,
   availableStreams
 }: AdvanceFilterProps) {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleToggleType = (type: string) => {
     setFilters(prev => ({
@@ -111,7 +111,30 @@ export default function AdvanceFilter({
   }
 
   return (
-    <div className={`h-full flex flex-col bg-white border-l border-gray-100 transition-all duration-300 ${isOpen ? 'w-80' : 'w-0 overflow-hidden border-none'}`}>
+    <>
+      {/* Mobile Toggle Button */}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden fixed bottom-24 right-6 z-[50] w-12 h-12 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-xl text-indigo-600 active:scale-95 transition-transform"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="md:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-[55]" 
+            onClick={() => setIsOpen(false)} 
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={`fixed inset-y-0 right-0 z-[60] transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'} md:relative md:translate-x-0 h-full flex flex-col bg-white md:border-l border-gray-100 md:w-80 w-[85vw] sm:w-[350px] shadow-2xl md:shadow-none`}>
       <div className="flex items-center justify-between p-6 border-b border-gray-50">
         <h3 className="text-lg font-black text-gray-900 tracking-tighter uppercase">Filters</h3>
         <button 
@@ -311,5 +334,6 @@ export default function AdvanceFilter({
         </p>
       </div>
     </div>
+    </>
   )
 }

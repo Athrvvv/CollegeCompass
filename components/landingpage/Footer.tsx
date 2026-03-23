@@ -38,8 +38,8 @@ export default function Footer() {
       {/* Background decoration */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
       
-      <div className="max-w-7xl mx-auto px-8">
-        <div className="grid lg:grid-cols-2 gap-24 items-start">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
           
           {/* Left Column: Mission + Links */}
           <div className="space-y-12">
@@ -57,7 +57,7 @@ export default function Footer() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12">
               <div className="space-y-4">
                 <h4 className="font-bold text-slate-900 text-sm uppercase tracking-widest">Product</h4>
                 <ul className="space-y-2 text-sm text-slate-500">
@@ -82,7 +82,7 @@ export default function Footer() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white p-10 rounded-[2rem] border border-slate-200 shadow-2xl shadow-slate-200/50 relative overflow-hidden"
+            className="bg-white p-6 sm:p-10 rounded-[2rem] border border-slate-200 shadow-2xl shadow-slate-200/50 relative overflow-hidden"
           >
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-slate-900 mb-2">Send us a query</h3>
@@ -163,9 +163,9 @@ export default function Footer() {
           </motion.div>
         </div>
 
-        <div className="mt-24 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
+        <div className="mt-16 sm:mt-24 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest text-center sm:text-left">
           <p>© {new Date().getFullYear()} CollegeCompass. All rights reserved.</p>
-          <div className="flex gap-8">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
             <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
           </div>

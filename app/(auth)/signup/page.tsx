@@ -9,7 +9,7 @@ export default function SignupPage() {
   const [state, action, isPending] = useActionState(signUpWithEmail, null)
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 py-24 sm:py-12 overflow-x-hidden overflow-y-auto bg-slate-950">
       {/* Dynamic Background Elements */}
       <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full animate-pulse" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-violet-600/20 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
@@ -18,7 +18,7 @@ export default function SignupPage() {
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="absolute top-8 left-8 z-50"
+        className="absolute top-6 left-4 sm:top-8 sm:left-8 z-50"
       >
         <Link
           href="/"
@@ -37,7 +37,7 @@ export default function SignupPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-[440px]"
+        className="relative z-10 w-full max-w-[440px] mt-12 sm:mt-0"
       >
         {/* Logo Section */}
         <div className="text-center mb-10">

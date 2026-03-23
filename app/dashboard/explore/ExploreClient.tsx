@@ -178,7 +178,7 @@ export default function ExploreClient({ colleges }: { colleges: any[] }) {
               subtitle="Major educational centers by state"
               icon="📍"
             />
-            <div className="grid grid-cols-2 gap-4 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
               {states.map(([state, count]) => (
                 <div key={state} className="bg-white p-6 rounded-2xl border border-gray-100 hover:border-indigo-600 transition-all group flex items-center justify-between cursor-pointer">
                   <div>

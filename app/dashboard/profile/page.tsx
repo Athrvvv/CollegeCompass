@@ -287,11 +287,11 @@ export default function ProfilePage() {
               <h3 className="text-2xl font-black text-slate-900 tracking-tight">Identity Core</h3>
             </div>
             <div className="space-y-5 relative">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InfoItem label="First Name" value={editedProfile.first_name} isEditing={isEditing} onChange={(v) => setEditedProfile({...editedProfile, first_name: v})} />
                 <InfoItem label="Last Name" value={editedProfile.last_name} isEditing={isEditing} onChange={(v) => setEditedProfile({...editedProfile, last_name: v})} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-wider text-slate-400">Gender</label>
                   {isEditing ? (

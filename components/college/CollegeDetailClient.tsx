@@ -232,7 +232,7 @@ export default function CollegeDetailClient({
               )}
 
               {activeTab === "Courses & Fees" && details?.courses && (
-                <div className="bg-white p-0 rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white p-0 rounded-xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto custom-scrollbar">
                    <table className="w-full text-left text-sm whitespace-nowrap">
                       <thead className="bg-[#edf2fa] text-gray-900 font-bold border-b border-gray-200">
                          <tr>

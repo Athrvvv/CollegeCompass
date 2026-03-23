@@ -19,11 +19,11 @@ export default function Navbar() {
     <motion.nav 
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 px-6 ${
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 px-4 sm:px-6 ${
         scrolled ? "py-4" : "py-6"
       }`}
     >
-      <div className={`max-w-7xl mx-auto h-16 rounded-2xl flex items-center justify-between px-8 transition-all duration-500 ${
+      <div className={`max-w-7xl mx-auto h-16 rounded-2xl flex items-center justify-between px-4 sm:px-8 transition-all duration-500 ${
         scrolled 
           ? "bg-white/70 backdrop-blur-md border border-slate-100 shadow-xl shadow-slate-200/50" 
           : "bg-transparent border-transparent"
@@ -42,18 +42,18 @@ export default function Navbar() {
         <div className="hidden md:flex flex-1"></div>
 
         {/* CTA Button */}
-        <div className="flex items-center gap-6">
-          <Link 
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/*<Link 
             href="/login" 
             className="text-[13px] font-semibold text-slate-500 hover:text-slate-800 transition-colors"
           >
             Log in
-          </Link>
+          </Link>*/}
           <Link 
-            href="/signup" 
+            href="/login" 
             className="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold hover:bg-slate-900 transition-all shadow-md shadow-slate-200 active:scale-95"
           >
-            Join
+            Log in
           </Link>
         </div>
       </div>

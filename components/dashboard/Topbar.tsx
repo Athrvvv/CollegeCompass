@@ -22,7 +22,7 @@ function SearchInput() {
   }
 
   return (
-    <form onSubmit={handleSearch} className="group flex items-center w-full max-w-xl bg-white/5 hover:bg-white/10 border border-white/10 focus-within:border-white/20 focus-within:bg-white/10 rounded-full px-5 py-2.5 transition-all duration-300 ease-out">
+    <form onSubmit={handleSearch} className="group flex items-center w-full bg-white/5 hover:bg-white/10 border border-white/10 focus-within:border-white/20 focus-within:bg-white/10 rounded-full px-4 py-2 sm:py-2.5 transition-all duration-300 ease-out">
       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 group-focus-within:text-white transition-colors duration-300 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
@@ -30,8 +30,8 @@ function SearchInput() {
         type="text"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search colleges, courses..."
-        className="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-white placeholder-gray-500"
+        placeholder="Search..."
+        className="flex-1 min-w-0 bg-transparent border-none outline-none text-[13px] sm:text-[15px] font-medium text-white placeholder-gray-500"
       />
       <button type="submit" className="hidden"></button>
       <kbd className="hidden sm:flex items-center justify-center gap-1 bg-white/10 border border-white/10 rounded-full px-3 py-1 group-focus-within:opacity-0 group-focus-within:translate-x-2 transition-all duration-300 shrink-0">
@@ -80,50 +80,68 @@ export default function Topbar() {
   ]
 
   return (
-    <div className="w-full bg-slate-950/90 backdrop-blur-xl border-b border-white/5 px-6 py-3 flex items-center justify-between shadow-2xl z-50 sticky top-0">
+    <div className="w-full bg-slate-950/90 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 py-3 flex flex-wrap sm:flex-nowrap items-center justify-between shadow-2xl z-50 sticky top-0 gap-y-3 gap-x-4">
 
       {/* SEARCH BAR WITH SUSPENSE */}
-      <Suspense fallback={<div className="w-full max-w-xl bg-white/5 rounded-full px-5 py-2.5 h-10 animate-pulse" />}>
-        <SearchInput />
+      <Suspense fallback={<div className="flex-1 sm:max-w-xl bg-white/5 rounded-full px-5 py-2.5 h-10 animate-pulse min-w-0" />}>
+        <div className="flex-1 min-w-0 sm:max-w-xl">
+          <SearchInput />
+        </div>
       </Suspense>
 
       {/* TABS SECTION */}
-      <nav className="flex items-center bg-white/5 p-1 rounded-xl border border-white/10 mx-4">
+      <nav className="w-full sm:w-auto sm:flex-1 order-3 sm:order-none flex justify-start items-center overflow-x-auto no-scrollbar mask-gradient-right pb-1 sm:pb-0 -mx-4 sm:mx-0 px-4 sm:px-0">
+        <div className="flex items-center gap-2 sm:gap-1 sm:bg-white/5 sm:p-1.5 sm:rounded-2xl sm:border border-white/10 w-max pr-4 sm:pr-0">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href
+          
+          if (tab.name === "FYP") {
+            return (
+              <Link
+                key={tab.name}
+                href={tab.href}
+                className={`relative px-4 sm:px-5 py-2 sm:py-2 text-[12px] sm:text-sm font-bold transition-all duration-300 ease-out rounded-full sm:rounded-xl whitespace-nowrap group/fyp overflow-hidden border ${
+                  isActive
+                    ? 'text-white border-transparent bg-white/10 shadow-[0_0_30px_rgba(168,85,247,0.3)]'
+                    : 'text-white/90 border-purple-500/30 sm:border-transparent bg-linear-to-r from-red-500/10 via-blue-500/10 to-purple-500/10 sm:bg-transparent hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                }`}
+              >
+                {!isActive && <div className="absolute inset-0 bg-linear-to-r from-red-500/10 via-blue-500/10 to-purple-500/10 sm:from-transparent sm:group-hover/fyp:from-red-500/10 transition-all duration-500 -z-10" />}
+                <span className="relative z-10 flex items-center gap-2.5">
+                  <span className="bg-linear-to-r from-red-300 uppercase via-blue-300 to-purple-300 bg-clip-text text-transparent">{tab.name}</span>
+                  <span className="text-[11px] animate-pulse">✨</span>
+                </span>
+                {isActive && (
+                  <span className="absolute -bottom-px left-1/2 -translate-x-1/2 w-8 h-[2px] bg-linear-to-r from-transparent via-purple-500 to-transparent shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
+                )}
+              </Link>
+            )
+          }
+
           return (
             <Link
               key={tab.name}
               href={tab.href}
-              className={`relative px-4 py-1.5 text-sm font-bold transition-all duration-300 ease-out rounded-lg
+              className={`relative px-4 sm:px-5 py-2 sm:py-2 text-[12px] sm:text-sm font-bold transition-all duration-300 ease-out rounded-full sm:rounded-xl whitespace-nowrap border
                 ${isActive 
-                  ? 'text-white bg-white/10 shadow-lg ring-1 ring-white/20' 
-                  : tab.name === "FYP"
-                    ? 'text-white/90 group/fyp'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'text-slate-900 sm:text-white bg-white sm:bg-white/10 shadow-[0_8px_20px_-6px_rgba(255,255,255,0.2)] border-transparent' 
+                  : 'text-slate-400 hover:text-white bg-white/5 sm:bg-transparent sm:hover:bg-white/5 border-white/5 sm:border-transparent'
                 }`}
             >
-              {tab.name === "FYP" && !isActive && (
-                <>
-                  <div className="absolute -inset-[1px] rounded-lg p-[1.5px] bg-linear-to-r from-red-500 via-blue-500 to-purple-500 -z-10 opacity-70 group-hover/fyp:opacity-100 transition-all duration-300">
-                    <div className="absolute inset-[1px] bg-slate-950 rounded-[7px]" />
-                  </div>
-                </>
-              )}
               <span className="relative z-10 flex items-center gap-1.5">
                 {tab.name}
-                {tab.name === "FYP" && <span className="text-[10px] animate-bounce">✨</span>}
               </span>
               {isActive && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                <span className="absolute -bottom-px left-1/2 -translate-x-1/2 w-6 h-[2px] bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] hidden sm:block"></span>
               )}
             </Link>
           )
         })}
+        </div>
       </nav>
 
       {/* RIGHT SECTION */}
-      <div className="flex items-center gap-6 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-6 shrink-0 order-2 sm:order-none">
 
         {/* PROFILE SECTION */}
         <div
@@ -131,11 +149,11 @@ export default function Topbar() {
           onMouseEnter={() => setProfileOpen(true)}
           onMouseLeave={() => setProfileOpen(false)}
         >
-          <button className="group flex items-center gap-2.5 p-1 pr-3 rounded-full border border-transparent hover:border-white/10 hover:bg-white/5 transition-all duration-300 ease-out">
+          <button className="group flex items-center gap-2 p-1 sm:pr-3 rounded-full border border-transparent hover:border-white/10 hover:bg-white/5 transition-all duration-300 ease-out">
             <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center text-sm font-bold shadow-sm ring-1 ring-white group-hover:scale-105 transition-all duration-300">
               {name ? name.charAt(0).toUpperCase() : "U"}
             </div>
-            <span className="text-sm font-bold text-white tracking-tight transition-colors duration-300">
+            <span className="text-[13px] sm:text-sm font-bold text-white tracking-tight transition-colors duration-300 hidden sm:inline-block">
               {name || "User"}
             </span>
           </button>

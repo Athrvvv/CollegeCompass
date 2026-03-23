@@ -64,27 +64,6 @@ export default function ReportPage() {
           >
             <SynthesisPanel selectedIds={selectedIds} />
 
-            <div className="bg-[#111827]/30 border border-gray-800 rounded-[32px] p-8">
-              <h3 className="text-lg font-bold mb-4">Upcoming Deadlines</h3>
-              <div className="space-y-4">
-                {[
-                  { title: "COEP Form Submission", date: "Mar 20" },
-                  { title: "VJTI Counselling", date: "Apr 05" }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-4 group">
-                    <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-all">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-gray-200">{item.title}</div>
-                      <div className="text-xs text-gray-500 font-medium">{item.date}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
 
           </motion.div>
 

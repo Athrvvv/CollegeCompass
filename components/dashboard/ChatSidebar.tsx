@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 
 export default function ChatSidebar() {
   const router = useRouter()
+  const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState("")
   const [chats, setChats] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
@@ -102,10 +103,40 @@ export default function ChatSidebar() {
   }
 
   return (
-    <div className="relative shrink-0 flex h-full z-40 bg-slate-950 border-r border-slate-800/50">
-      
-      {/* MAIN SIDEBAR CONTENT */}
-      <aside className="w-72 text-slate-200 flex flex-col px-5 py-6 overflow-y-auto h-full relative z-50 bg-slate-950/80 backdrop-blur-xl shadow-2xl custom-scrollbar">
+    <>
+      {/* Mobile Toggle Button */}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden fixed bottom-6 right-6 z-[60] w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center shadow-xl text-white shadow-indigo-500/30 active:scale-95 transition-transform"
+      >
+        {isOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="md:hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[45]" 
+            onClick={() => setIsOpen(false)} 
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 shrink-0 flex h-full bg-slate-950 md:border-r border-slate-800/50 shadow-2xl md:shadow-none`}>
+        
+        {/* MAIN SIDEBAR CONTENT */}
+        <aside className="w-[85vw] sm:w-80 md:w-72 text-slate-200 flex flex-col px-5 py-6 overflow-y-auto h-full relative z-50 bg-slate-950/80 backdrop-blur-xl custom-scrollbar">
         <div className="flex-1 flex flex-col h-full relative">
 
           <AnimatePresence mode="wait">
@@ -245,7 +276,7 @@ export default function ChatSidebar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-20px", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute left-72 top-4 bottom-4 w-[850px] bg-slate-900/95 backdrop-blur-2xl border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-40 flex flex-col overflow-hidden rounded-2xl"
+              className="fixed inset-0 sm:inset-4 md:left-[300px] md:top-4 md:bottom-4 md:right-auto md:w-[600px] lg:w-[850px] bg-slate-900/95 backdrop-blur-2xl border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[60] flex flex-col overflow-hidden sm:rounded-2xl"
             >
               {/* Header */}
               <div className="px-8 py-6 border-b border-slate-800/50 flex items-center justify-between bg-slate-900/50 backdrop-blur-md z-10 sticky top-0">
@@ -412,5 +443,6 @@ export default function ChatSidebar() {
       </AnimatePresence>
 
     </div>
+    </>
   )
 }

@@ -9,77 +9,97 @@ export default function ComparisonTable({ data }: { data: any[] }) {
   const [activeTab, setActiveTab] = useState<TabType>("General")
   const TABS: TabType[] = ["General", "Placements", "Courses", "Cutoff", "Ratings"]
 
-  const renderGeneral = () => (
-    <div className="overflow-x-auto custom-scrollbar">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-white/5 border-y border-white/10">
-            <th className="px-6 py-5 text-left text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-1/4">Feature</th>
-            {data.map((item, i) => (
-              <th key={i} className="px-6 py-5 text-left text-sm font-black text-white border-l border-white/5">
-                {item.college.college_name}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/5">
-          {[
-            { label: "Location", key: (c: any) => `${c.college.city}, ${c.college.state}` },
-            { label: "University Type", key: (c: any) => c.college.typeofuni },
-            { label: "Established", key: (c: any) => c.college.established_year },
-            { label: "Approvals", key: (c: any) => c.college.approvals || "N/A" },
-            { label: "Top Exams", key: (c: any) => c.college.top_exams?.join(", ") || "N/A" },
-          ].map((row, i) => (
-            <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
-              <td className="px-6 py-5 text-xs font-bold text-gray-400 group-hover:text-indigo-300 transition-colors uppercase tracking-wider">{row.label}</td>
-              {data.map((item, j) => (
-                <td key={j} className="px-6 py-5 text-sm text-gray-300 border-l border-white/5 font-medium">
-                  {row.key(item)}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+  const renderGeneral = () => {
+    const features = [
+      { label: "Location", key: (c: any) => `${c.college.city}, ${c.college.state}` },
+      { label: "University Type", key: (c: any) => c.college.typeofuni },
+      { label: "Established", key: (c: any) => c.college.established_year },
+      { label: "Approvals", key: (c: any) => c.college.approvals || "N/A" },
+      { label: "Top Exams", key: (c: any) => c.college.top_exams?.join(", ") || "N/A" },
+    ];
 
-  const renderPlacements = () => (
-    <div className="overflow-x-auto custom-scrollbar">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-white/5 border-y border-white/10">
-            <th className="px-6 py-5 text-left text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-1/4">Metric</th>
-            {data.map((item, i) => (
-              <th key={i} className="px-6 py-5 text-left text-sm font-black text-white border-l border-white/5">
-                {item.college.college_name}
+    return (
+      <div className="overflow-x-auto w-full custom-scrollbar snap-x snap-mandatory">
+        <table className="w-full border-separate border-spacing-0 min-w-max">
+          <thead>
+            <tr className="bg-slate-900/60 border-y border-white/10">
+              <th className="px-5 py-4 sm:px-6 sm:py-5 text-left text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-[120px] sm:w-[180px] shrink-0 border-r border-white/5">
+                Feature
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/5">
-          {[
-            { label: "Highest Package", key: (c: any) => c.details.placements[0] ? `₹${Number(c.details.placements[0].highest_package).toLocaleString('en-IN')}` : "N/A" },
-            { label: "Average Package", key: (c: any) => c.details.placements[0] ? `₹${Number(c.details.placements[0].avg_package).toLocaleString('en-IN')}` : "N/A" },
-            { label: "Lowest Package", key: (c: any) => c.details.placements[0] ? `₹${Number(c.details.placements[0].lowest_package).toLocaleString('en-IN')}` : "N/A" },
-          ].map((row, i) => (
-            <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
-              <td className="px-6 py-5 text-xs font-bold text-gray-400 group-hover:text-indigo-300 transition-colors uppercase tracking-wider">{row.label}</td>
-              {data.map((item, j) => (
-                <td key={j} className="px-6 py-5 text-base border-l border-white/5 font-black text-indigo-400">
-                  {row.key(item)}
-                </td>
+              {data.map((item, i) => (
+                <th key={i} className="px-5 py-4 sm:px-6 sm:py-5 text-left text-sm font-black text-white min-w-[200px] sm:min-w-[260px] snap-start border-l border-white/5">
+                  <div className="line-clamp-2 leading-tight">
+                    {item.college.college_name}
+                  </div>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {features.map((row, i) => (
+              <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
+                <td className="px-5 py-4 sm:px-6 sm:py-5 text-[10px] sm:text-xs font-bold text-gray-400 group-hover:text-indigo-300 transition-colors uppercase tracking-wider border-r border-white/5">
+                  {row.label}
+                </td>
+                {data.map((item, j) => (
+                  <td key={j} className="px-5 py-4 sm:px-6 sm:py-5 text-xs sm:text-sm text-gray-300 border-l border-white/5 font-medium leading-relaxed bg-white/[0.01]">
+                    {row.key(item)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  const renderPlacements = () => {
+    const metrics = [
+      { label: "Highest Package", key: (c: any) => c.details.placements[0] ? `₹${Number(c.details.placements[0].highest_package).toLocaleString('en-IN')}` : "N/A" },
+      { label: "Average Package", key: (c: any) => c.details.placements[0] ? `₹${Number(c.details.placements[0].avg_package).toLocaleString('en-IN')}` : "N/A" },
+      { label: "Lowest Package", key: (c: any) => c.details.placements[0] ? `₹${Number(c.details.placements[0].lowest_package).toLocaleString('en-IN')}` : "N/A" },
+    ];
+
+    return (
+      <div className="overflow-x-auto w-full custom-scrollbar snap-x snap-mandatory">
+        <table className="w-full border-separate border-spacing-0 min-w-max">
+          <thead>
+            <tr className="bg-slate-900/60 border-y border-white/10">
+              <th className="px-5 py-4 sm:px-6 sm:py-5 text-left text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-[120px] sm:w-[180px] shrink-0 border-r border-white/5">
+                Metric
+              </th>
+              {data.map((item, i) => (
+                <th key={i} className="px-5 py-4 sm:px-6 sm:py-5 text-left text-sm font-black text-white min-w-[200px] sm:min-w-[260px] snap-start border-l border-white/5">
+                  <div className="line-clamp-2 leading-tight">
+                    {item.college.college_name}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {metrics.map((row, i) => (
+              <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
+                <td className="px-5 py-4 sm:px-6 sm:py-5 text-[10px] sm:text-xs font-bold text-gray-400 group-hover:text-indigo-300 transition-colors uppercase tracking-wider border-r border-white/5">
+                  {row.label}
+                </td>
+                {data.map((item, j) => (
+                  <td key={j} className="px-5 py-4 sm:px-6 sm:py-5 text-[15px] sm:text-base border-l border-white/5 font-black text-indigo-400 bg-indigo-500/[0.02]">
+                    {row.key(item)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
 
   const renderCourses = () => (
     <div className="overflow-x-auto custom-scrollbar">
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 p-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6 p-4 md:p-8">
         {data.map((item, i) => (
           <div key={i} className="bg-white/[0.03] rounded-3xl p-6 border border-white/10 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-600/5 blur-2xl rounded-full" />
@@ -101,7 +121,7 @@ export default function ComparisonTable({ data }: { data: any[] }) {
 
   const renderCutoff = () => (
     <div className="overflow-x-auto custom-scrollbar">
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6 p-4 md:p-8">
         {data.map((item, i) => (
           <div key={i} className="bg-white/[0.03] rounded-3xl p-6 border border-white/10 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-violet-600/5 blur-2xl rounded-full" />
@@ -127,48 +147,58 @@ export default function ComparisonTable({ data }: { data: any[] }) {
     </div>
   )
 
-  const renderRatings = () => (
-    <div className="overflow-x-auto custom-scrollbar">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-white/5 border-y border-white/10">
-            <th className="px-6 py-5 text-left text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-1/4">Category</th>
-            {data.map((item, i) => (
-              <th key={i} className="px-6 py-5 text-left text-sm font-black text-white border-l border-white/5">
-                {item.college.college_name}
+  const renderRatings = () => {
+    const categories = [
+      { label: "Hostel", key: "hostel" },
+      { label: "Academic", key: "academic" },
+      { label: "Faculty", key: "faculty" },
+      { label: "Infrastructure", key: "infra" },
+      { label: "Placement", key: "placement" },
+    ];
+
+    return (
+      <div className="overflow-x-auto w-full custom-scrollbar snap-x snap-mandatory">
+        <table className="w-full border-separate border-spacing-0 min-w-max">
+          <thead>
+            <tr className="bg-slate-900/60 border-y border-white/10">
+              <th className="px-5 py-4 sm:px-6 sm:py-5 text-left text-[10px] font-black text-orange-400 uppercase tracking-[0.2em] w-[120px] sm:w-[180px] shrink-0 border-r border-white/5">
+                Category
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/5">
-          {[
-            { label: "Hostel", key: "hostel" },
-            { label: "Academic", key: "academic" },
-            { label: "Faculty", key: "faculty" },
-            { label: "Infrastructure", key: "infra" },
-            { label: "Placement", key: "placement" },
-          ].map((row, i) => (
-            <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
-              <td className="px-6 py-5 text-xs font-bold text-gray-400 group-hover:text-indigo-300 transition-colors uppercase tracking-wider">{row.label}</td>
-              {data.map((item, j) => (
-                <td key={j} className="px-6 py-5 text-sm border-l border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.3)] transition-all duration-1000" 
-                            style={{ width: `${(item.details?.ratings?.[row.key] || 0) * 20}%` }}
-                        />
-                    </div>
-                    <span className="font-black text-white text-xs">{item.details?.ratings?.[row.key] || "0.0"}</span>
+              {data.map((item, i) => (
+                <th key={i} className="px-5 py-4 sm:px-6 sm:py-5 text-left text-sm font-black text-white min-w-[200px] sm:min-w-[260px] snap-start border-l border-white/5">
+                  <div className="line-clamp-2 leading-tight">
+                    {item.college.college_name}
                   </div>
-                </td>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {categories.map((row, i) => (
+              <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
+                <td className="px-5 py-4 sm:px-6 sm:py-5 text-[10px] sm:text-xs font-bold text-gray-400 group-hover:text-orange-300 transition-colors uppercase tracking-wider border-r border-white/5">
+                  {row.label}
+                </td>
+                {data.map((item, j) => (
+                  <td key={j} className="px-5 py-4 sm:px-6 sm:py-5 text-sm border-l border-white/5 bg-white/[0.01]">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 max-w-[120px] h-1.5 bg-white/5 rounded-full overflow-hidden">
+                          <div 
+                              className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.3)] transition-all duration-1000" 
+                              style={{ width: `${(item.details?.ratings?.[row.key as keyof typeof item.details.ratings] || 0) * 20}%` }}
+                          />
+                      </div>
+                      <span className="font-black text-white text-[11px] sm:text-xs">{item.details?.ratings?.[row.key as keyof typeof item.details.ratings] || "0.0"}</span>
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[40px] shadow-3xl overflow-hidden ring-1 ring-white/5">

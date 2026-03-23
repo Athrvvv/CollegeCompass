@@ -26,33 +26,33 @@ const COMPARISON_PALETTE = [
 ];
 
 // --- Sub-Components ---
-const AdmissionProbabilityGauge = ({ probability }: { probability: number }) => {
+const AdmissionProbabilityGauge = ({ probability, isMobile }: { probability: number, isMobile?: boolean }) => {
   const data = [{ name: 'L', value: probability, fill: probability > 75 ? '#22c55e' : (probability > 40 ? '#f59e0b' : '#ef4444') }];
   return (
-    <div className="relative w-full h-48 flex items-center justify-center">
+    <div className={`relative w-full ${isMobile ? 'h-36' : 'h-48'} flex items-center justify-center`}>
       <ResponsiveContainer width="100%" height="100%">
-        <RadialBarChart cx="50%" cy="50%" innerRadius="70%" outerRadius="100%" barSize={20} data={data} startAngle={180} endAngle={0}>
+        <RadialBarChart cx="50%" cy="50%" innerRadius="70%" outerRadius="100%" barSize={isMobile ? 12 : 20} data={data} startAngle={180} endAngle={0}>
           <RadialBar background dataKey="value" cornerRadius={10} />
         </RadialBarChart>
       </ResponsiveContainer>
-      <div className="absolute inset-0 flex flex-col items-center justify-center pt-10">
-        <span className="text-3xl font-black text-slate-900">{probability}%</span>
+      <div className={`absolute inset-0 flex flex-col items-center justify-center ${isMobile ? 'pt-6' : 'pt-10'}`}>
+        <span className={`${isMobile ? 'text-xl' : 'text-3xl'} font-black text-slate-900`}>{probability}%</span>
         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Chance</span>
       </div>
     </div>
   );
 };
 
-const MarketStabilityPie = ({ stability, volatility }: { stability: number, volatility: number }) => {
+const MarketStabilityPie = ({ stability, volatility, isMobile }: { stability: number, volatility: number, isMobile?: boolean }) => {
   const data = [
     { name: 'Stability', value: stability, fill: '#6366f1' },
     { name: 'Volatility', value: volatility, fill: '#fda4af' },
   ];
   return (
-    <div className="w-full h-48">
+    <div className={`w-full ${isMobile ? 'h-40' : 'h-48'}`}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value">
+          <Pie data={data} cx="50%" cy="50%" innerRadius={isMobile ? 40 : 50} outerRadius={isMobile ? 55 : 70} paddingAngle={5} dataKey="value">
             {data.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
           </Pie>
           <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }} />
@@ -105,6 +105,15 @@ export default function CutoffTrendsClient() {
 
   // Comparison State
   const [comparisonBench, setComparisonBench] = useState<BenchItem[]>([])
+
+  // Mobile Detection
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Modal State
   const [remarkModal, setRemarkModal] = useState<{
@@ -543,14 +552,14 @@ export default function CutoffTrendsClient() {
                   </div>
 
                   {/* Main Graph Area */}
-                  <div className="flex-1 bg-white border border-slate-200 rounded-[2.5rem] shadow-sm p-8 flex flex-col min-h-[500px]">
+                  <div className="flex-1 bg-white border border-slate-200 rounded-[2.5rem] shadow-sm p-4 md:p-8 flex flex-col md:min-h-[500px] min-h-[350px]">
                     {activeTrend ? (
                       <>
-                        <div className="flex justify-between items-start mb-8">
+                        <div className="flex justify-between items-start mb-6 md:mb-8">
                           <div>
                             <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg mb-2">Predictive Analysis</span>
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tightest mb-1">{activeTrend.course_name}</h2>
-                            <p className="text-sm font-bold text-slate-500">{activeTrend.specialization_name || "General Specialty"} • {activeTrend.exam_name}</p>
+                            <h2 className="text-xl md:text-3xl font-black text-slate-900 tracking-tightest mb-1">{activeTrend.course_name}</h2>
+                            <p className="text-[11px] md:text-sm font-bold text-slate-500">{activeTrend.specialization_name || "General Specialty"} • {activeTrend.exam_name}</p>
                           </div>
                           <div className="flex gap-2">
                              <button 
@@ -585,10 +594,10 @@ export default function CutoffTrendsClient() {
                             <ComposedChart data={[
                                 ...activeTrend.data,
                                 ...(aiAnalysis ? [{ year: 2026, GEN: aiAnalysis.predicted_rank, isPrediction: true }] : [])
-                            ]} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            ]} margin={{ top: 10, right: isMobile ? 10 : 30, left: 0, bottom: 0 }}>
                               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                              <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 800}} dy={10} />
-                              <YAxis reversed axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 800}} dx={-10} tickFormatter={(v) => v.toLocaleString()} />
+                              <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: isMobile ? 10 : 12, fontWeight: 800}} dy={10} />
+                              <YAxis reversed axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: isMobile ? 10 : 12, fontWeight: 800}} dx={-10} tickFormatter={(v) => v.toLocaleString()} />
                               <Tooltip 
                                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', fontWeight: 'bold' }}
                                 content={({ active, payload, label }) => {
@@ -616,8 +625,8 @@ export default function CutoffTrendsClient() {
                                     type="monotone" 
                                     dataKey={cat} 
                                     stroke={CATEGORY_COLORS[cat] || COMPARISON_PALETTE[i % 6]} 
-                                    strokeWidth={4} 
-                                    dot={{ r: 6 }} 
+                                    strokeWidth={isMobile ? 2.5 : 4} 
+                                    dot={{ r: isMobile ? 3 : 6 }} 
                                     strokeDasharray={cat === "PRED" ? "5 5" : ""}
                                     connectNulls 
                                 />
@@ -627,9 +636,9 @@ export default function CutoffTrendsClient() {
                                     type="monotone" 
                                     dataKey="GEN" 
                                     stroke="#4f46e5" 
-                                    strokeWidth={4} 
+                                    strokeWidth={isMobile ? 2.5 : 4} 
                                     strokeDasharray="5 5" 
-                                    dot={{ r: 8, fill: '#4f46e5', stroke: '#fff', strokeWidth: 2 }} 
+                                    dot={{ r: isMobile ? 4 : 8, fill: '#4f46e5', stroke: '#fff', strokeWidth: 2 }} 
                                     name="2026 AI Prediction (GEN)"
                                 />
                               )}
@@ -654,15 +663,15 @@ export default function CutoffTrendsClient() {
                         animate={{ opacity: 1, y: 0 }}
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
                     >
-                        <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Admission Prob.</h3>
-                            <AdmissionProbabilityGauge probability={aiAnalysis.admission_probability} />
-                            <p className="text-[10px] font-bold text-slate-500 text-center px-4 -mt-4 italic">Estimated based on rank drift & ensemble variance.</p>
+                        <div className="bg-white md:p-6 p-4 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center">
+                            <h3 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Admission Prob.</h3>
+                            <AdmissionProbabilityGauge probability={aiAnalysis.admission_probability} isMobile={isMobile} />
+                            <p className="text-[9px] md:text-[10px] font-bold text-slate-500 text-center px-4 -mt-4 italic">Estimated based on rank drift & ensemble variance.</p>
                         </div>
 
-                        <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Market Stability</h3>
-                            <MarketStabilityPie stability={aiAnalysis.stability_score} volatility={aiAnalysis.volatility_score} />
+                        <div className="bg-white md:p-6 p-4 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center">
+                            <h3 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Market Stability</h3>
+                            <MarketStabilityPie stability={aiAnalysis.stability_score} volatility={aiAnalysis.volatility_score} isMobile={isMobile} />
                             <div className="flex gap-4 -mt-2">
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-indigo-600 uppercase"><div className="w-2 h-2 rounded-full bg-indigo-500" /> Stable</span>
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-rose-400 uppercase"><div className="w-2 h-2 rounded-full bg-rose-300" /> Volatile</span>
@@ -722,13 +731,12 @@ export default function CutoffTrendsClient() {
                                     Recommended: {aiAnalysis.recommended_round}
                                 </div>
                             </div>
-                            
-                            <div className="h-64 w-full">
+                                                        <div className="md:h-64 h-56 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={aiAnalysis.round_predictions} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                    <BarChart data={aiAnalysis.round_predictions} margin={{ top: 10, right: isMobile ? 10 : 30, left: 0, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="round_name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 800}} />
-                                        <YAxis reversed axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 800}} />
+                                        <XAxis dataKey="round_name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: isMobile ? 10 : 12, fontWeight: 800}} />
+                                        <YAxis reversed axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: isMobile ? 10 : 12, fontWeight: 800}} />
                                         <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', fontWeight: 'bold' }} />
                                         <Bar dataKey="predicted_cutoff" name="Predicted Cutoff" fill="#4f46e5" radius={[10, 10, 0, 0]}>
                                             {aiAnalysis.round_predictions.map((entry, index) => (
@@ -739,7 +747,7 @@ export default function CutoffTrendsClient() {
                                 </ResponsiveContainer>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-4 mt-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-6">
                                 {aiAnalysis.round_predictions.map((r) => (
                                     <div key={r.round_name} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{r.round_name}</span>
@@ -828,12 +836,12 @@ export default function CutoffTrendsClient() {
                 {comparisonBench.length > 0 ? (
                   <div className="flex flex-col gap-8">
                     {/* Comparative Controls */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {comparisonBench.map((item, i) => (
-                        <div key={item.id} className="bg-white p-6 rounded-4xl border-l-8 shadow-sm flex items-center justify-between" style={{ borderLeftColor: COMPARISON_PALETTE[i % 6] }}>
+                        <div key={item.id} className="bg-white p-4 md:p-6 rounded-4xl border-l-8 shadow-sm flex items-center justify-between" style={{ borderLeftColor: COMPARISON_PALETTE[i % 6] }}>
                           <div className="min-w-0 pr-4">
-                            <span className="block text-xs font-black text-slate-400 uppercase tracking-tighter mb-1 truncate">{item.collegeName.split(' - ')[0]}</span>
-                            <span className="block text-sm font-black text-slate-900 truncate">{item.courseName}</span>
+                            <span className="block text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-tighter mb-1 truncate">{item.collegeName.split(' - ')[0]}</span>
+                            <span className="block text-xs md:text-sm font-black text-slate-900 truncate">{item.courseName}</span>
                           </div>
                           <button onClick={() => removeFromCompare(item.id)} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" /></svg>
@@ -849,11 +857,11 @@ export default function CutoffTrendsClient() {
                     </div>
 
                     {/* Comparative Chart */}
-                    <div className="bg-white p-10 rounded-4xl border border-slate-200 shadow-sm relative">
-                      <div className="mb-10 flex justify-between items-start">
+                    <div className="bg-white p-6 md:p-10 rounded-4xl border border-slate-200 shadow-sm relative">
+                      <div className="mb-8 md:mb-10 flex justify-between items-start">
                         <div>
-                          <h2 className="text-3xl font-black text-slate-900 tracking-tightest">Comparative Cutoff Benchmark</h2>
-                          <p className="text-sm font-bold text-slate-500 mt-2 italic">Benchmarking based on primary seat category (GEN) across historical intake cycles.</p>
+                          <h2 className="text-xl md:text-3xl font-black text-slate-900 tracking-tightest">Comparative Benchmarking</h2>
+                          <p className="text-[11px] md:text-sm font-bold text-slate-500 mt-2 italic">Historical (GEN) intake cycles comparison.</p>
                         </div>
                         
                         <button 
@@ -882,21 +890,21 @@ export default function CutoffTrendsClient() {
                         </button>
                       </div>
 
-                      <div className="h-[500px] w-full">
+                      <div className="md:h-[500px] h-[400px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={comparisonChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                          <BarChart data={comparisonChartData} margin={{ top: 20, right: isMobile ? 10 : 30, left: 10, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 13, fontWeight: 900}} dy={10} />
-                            <YAxis reversed axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 800}} dx={-10} tickFormatter={(v) => v.toLocaleString()} />
+                            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: isMobile ? 11 : 13, fontWeight: 900}} dy={10} />
+                            <YAxis reversed axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: isMobile ? 10 : 12, fontWeight: 800}} dx={-10} tickFormatter={(v) => v.toLocaleString()} />
                             <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', fontWeight: 'bold' }} />
-                            <Legend wrapperStyle={{ paddingTop: '40px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }} />
+                            <Legend wrapperStyle={{ paddingTop: isMobile ? '20px' : '40px', fontSize: isMobile ? '9px' : '11px', fontWeight: 900, textTransform: 'uppercase' }} />
                             {comparisonBench.map((item, idx) => (
                               <Bar 
                                 key={item.id} 
                                 dataKey={`val_${idx}`} 
-                                name={item.collegeName.split(' - ')[0].substring(0, 15) + '...'} 
+                                name={isMobile ? item.collegeName.substring(0, 10) : item.collegeName.split(' - ')[0].substring(0, 15) + '...'} 
                                 fill={COMPARISON_PALETTE[idx % 6]}
-                                radius={[6, 6, 0, 0]}
+                                radius={isMobile ? [4, 4, 0, 0] : [6, 6, 0, 0]}
                               />
                             ))}
                           </BarChart>
