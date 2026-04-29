@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
           service: "gmail",
           auth: {
             user: "atharvapkhond@gmail.com",
-            pass: "idno ipuu hrkc cxme"
+            pass: "mnia ohwc ziax kupy"
           }
         });
 
