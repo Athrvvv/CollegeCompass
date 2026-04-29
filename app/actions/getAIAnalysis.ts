@@ -45,7 +45,7 @@ export interface AIAnalysisRequest {
 }
 
 export async function getAIAnalysis(request: AIAnalysisRequest): Promise<AIAnalysisResponse | null> {
-  const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8001";
+  const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8000";
 
   try {
     const response = await fetch(`${AI_SERVICE_URL}/api/v1/trends/predict`, {

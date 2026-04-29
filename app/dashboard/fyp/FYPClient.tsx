@@ -203,7 +203,7 @@ export default function FYPPage() {
 function PinterestCard({ college, index, isMobile }: { college: any, index: number, isMobile?: boolean }) {
   const router = useRouter()
   const { addNote, removeNote, isInNotebook } = useNotebook()
-  const [imgSrc, setImgSrc] = useState(college.logo_url || "/college-placeholder.png")
+  const [imgSrc, setImgSrc] = useState(college.logo_url || "/globe.svg")
 
   const isBookmarked = isInNotebook(college.college_id.toString())
 
@@ -222,7 +222,7 @@ function PinterestCard({ college, index, isMobile }: { college: any, index: numb
           rating: college.rating, 
           typeofuni: college.typeofuni 
         }],
-        remark: `Saved from FYP recommendations.`,
+        remark: `Match: ${Math.round(college.recommendationScore)}% - ${college.recommendationReasons.join(", ")}`,
         note_id: college.college_id.toString()
       })
     }
@@ -262,7 +262,7 @@ function PinterestCard({ college, index, isMobile }: { college: any, index: numb
                     alt={college.college_name}
                     fill
                     className="object-contain p-1.5"
-                    onError={() => setImgSrc("/college-placeholder.png")}
+                    onError={() => setImgSrc("/globe.svg")}
                  />
                </div>
                <div className="bg-black/60 backdrop-blur-2xl px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
@@ -307,7 +307,7 @@ function PinterestCard({ college, index, isMobile }: { college: any, index: numb
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                   {college.recommendationReasons.slice(0, 2).map((reason: string, i: number) => (
+                   {college.recommendationReasons.map((reason: string, i: number) => (
                      <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-[9px] font-black border border-white/10 whitespace-nowrap text-white/80 uppercase tracking-tight">
                        {reason}
                      </span>

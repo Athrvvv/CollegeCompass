@@ -8,6 +8,29 @@ import remarkGfm from "remark-gfm"
 import { useNotebook } from "@/context/NotebookContext"
 import RemarkModal from "@/components/notebook/RemarkModal"
 
+// Custom styles for premium look
+const customStyles = `
+  .custom-scrollbar-minimal::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar-minimal::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar-minimal::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  .custom-scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+`;
+
 interface AdvisorClientProps {
   initialExams: any[]
   initialCourses: any[]
@@ -40,6 +63,7 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
   const [isRemarkModalOpen, setIsRemarkModalOpen] = useState(false)
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false)
   const [isMobileHistoryOpen, setIsMobileHistoryOpen] = useState(false)
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true)
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -115,15 +139,15 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
 
   const renderHistoryContent = (isMobile: boolean) => (
     <>
-      <div className="p-4 md:p-5 border-b border-slate-100/60 bg-white/50 backdrop-blur-sm flex justify-between items-center z-10">
+      <div className="p-4 md:p-6 border-b border-white/5 bg-transparent flex justify-between items-center z-10">
         <button 
           onClick={() => { handleNewChat(); if(isMobile) setIsMobileHistoryOpen(false); }}
-          className="flex-1 py-2.5 px-4 bg-white border border-slate-200 rounded-xl text-[13px] font-bold text-slate-700 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]"
+          className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[13px] font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 active:scale-[0.98] border border-blue-400/20"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
           </svg>
-          New Chat
+          New Guidance
         </button>
         {isMobile && (
            <button onClick={() => setIsMobileHistoryOpen(false)} className="ml-3 p-2 bg-white shadow-sm border border-slate-200 rounded-xl text-slate-500 hover:text-slate-700 active:scale-95 transition-all">
@@ -134,8 +158,8 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
         )}
       </div>
       
-      <div className="flex-1 overflow-y-auto p-3 space-y-1.5 custom-scrollbar relative">
-        <div className="px-2 pb-2 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">History</div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar-minimal relative">
+        <div className="px-2 pb-3 pt-1 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Previous Journeys</div>
         {sessions.map((s, idx) => (
           <motion.button
             key={s.id}
@@ -143,14 +167,16 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
             animate={isMobile ? { opacity: 1, x: 0 } : false}
             transition={{ delay: idx * 0.05 + 0.1 }}
             onClick={() => { setActiveSessionId(s.id); if(isMobile) setIsMobileHistoryOpen(false); }}
-            className={`w-full text-left p-3 rounded-xl transition-all group border ${
+            className={`w-full text-left p-4 rounded-2xl transition-all group border ${
               activeSessionId === s.id 
-                ? 'bg-white border-blue-100 text-blue-700 shadow-sm shadow-blue-500/5' 
-                : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100/50'
+                ? 'bg-blue-600/10 border-blue-500/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] text-blue-400' 
+                : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-100 hover:border-white/5'
             }`}
           >
-            <div className="text-xs font-bold truncate pr-2">{s.title || "New Chat"}</div>
-            <div className="text-[10px] opacity-60 mt-1">{new Date(s.updated_at).toLocaleDateString()}</div>
+            <div className={`text-xs font-black truncate pr-2 ${activeSessionId === s.id ? 'text-blue-400' : 'text-slate-300 group-hover:text-white transition-colors'}`}>{s.title || "New Chat"}</div>
+            <div className={`text-[10px] mt-1 font-bold transition-opacity ${activeSessionId === s.id ? 'text-blue-400/60 opacity-100' : 'text-slate-500 group-hover:text-slate-400'}`}>
+              {new Date(s.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(s.updated_at).toLocaleDateString()}
+            </div>
           </motion.button>
         ))}
         {sessions.length === 0 && (
@@ -163,25 +189,32 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
   )
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-68px)] overflow-hidden relative">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-68px)] overflow-hidden relative bg-[#0a0f1d] selection:bg-blue-500/30">
+      <style>{customStyles}</style>
+      
+      {/* Background Decorative Gradients */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/5 blur-[120px] rounded-full" />
+      </div>
       
       {/* LEFT: FLOW CHART AREA */}
-      <div className="w-full h-full lg:w-[40%] xl:w-[35%] overflow-auto bg-[#f8fafc] p-4 lg:p-8 border-r border-slate-200">
-        <div className="max-w-5xl mx-auto space-y-16 pb-24 lg:pb-0">
+      <div className="w-full h-full lg:w-[45%] xl:w-[40%] 2xl:w-[35%] overflow-auto bg-transparent p-4 lg:p-10 border-r border-white/5 relative z-10 custom-scrollbar-minimal">
+        <div className="max-w-4xl mx-auto space-y-16 pb-24 lg:pb-0">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-3"
+            className="space-y-4"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 text-blue-300 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-500/30 shadow-lg shadow-blue-500/10">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
               Academic Navigator
             </div>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">Your Personal <span className="text-blue-600">Growth Map</span></h2>
-            <p className="text-slate-500 text-lg max-w-2xl">A multi-dimensional view of your educational journey. Interact with stages to explore pathways.</p>
+            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">Your Personal <span className="bg-linear-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Growth Map</span></h2>
+            <p className="text-slate-400 text-lg max-w-2xl font-medium leading-relaxed">A multi-dimensional view of your educational journey. Interact with stages to explore pathways.</p>
           </motion.div>
 
           <div className="relative">
@@ -199,16 +232,16 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                   onClick={() => setExpandedStage(expandedStage === 'school' ? null : 'school')}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`bg-white/80 backdrop-blur-xl p-8 rounded-[32px] shadow-2xl shadow-blue-500/5 border border-slate-200 w-full max-w-md text-center transition-all cursor-pointer hover:border-blue-500 active:scale-[0.98] ${expandedStage === 'school' ? 'ring-2 ring-blue-500 ring-offset-4' : ''}`}
+                  className={`bg-white/[0.03] backdrop-blur-[60px] p-8 rounded-[40px] shadow-2xl border border-white/10 w-full max-w-md text-center transition-all cursor-pointer hover:border-blue-500/50 hover:bg-white/[0.06] active:scale-[0.98] ${expandedStage === 'school' ? 'ring-2 ring-blue-500/50 ring-offset-4 ring-offset-[#0a0f1d]' : ''}`}
                 >
-                  <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/30 transform group-hover:rotate-6 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-20 h-20 bg-linear-to-br from-blue-600 to-indigo-600 text-white rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/40 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900">Foundation Stage</h3>
-                  <p className="text-slate-500 mt-2 font-medium">Secondary & Senior Secondary Schooling</p>
+                  <h3 className="text-2xl font-black text-white tracking-tight">Foundation Stage</h3>
+                  <p className="text-slate-400 mt-2 font-black uppercase tracking-widest text-[10px]">Secondary & Senior Secondary</p>
                   
                   <AnimatePresence>
                     {expandedStage === 'school' && (
@@ -251,30 +284,30 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
               {/* Level 2: Competitive Exams */}
               <div className="flex flex-col items-center">
                 <div className="text-center mb-10">
-                  <h3 className="text-xl font-extrabold text-slate-900 flex items-center justify-center gap-2">
+                  <h3 className="text-2xl font-black text-white flex items-center justify-center gap-3">
                     Entrance Gateways
-                    <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase tracking-widest">Crucial Step</span>
+                    <span className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-500/30">Crucial Step</span>
                   </h3>
-                  <p className="text-slate-500 text-sm mt-1">Unlock top universities across the country</p>
+                  <p className="text-slate-400 text-sm mt-2 font-medium">Unlock top universities across the country</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full px-4">
                   {initialExams.slice(0, 4).map((exam, i) => (
                     <motion.div 
                       key={exam.exam_id}
                       initial={{ opacity: 0, scale: 0.9 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.1 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                      className="bg-white p-6 rounded-[28px] shadow-xl shadow-slate-200/50 border border-slate-100 text-center cursor-pointer group hover:bg-indigo-600 transition-all duration-300"
+                      whileHover={{ y: -5, scale: 1.02, backgroundColor: "rgba(255,255,255,0.08)" }}
+                      className="bg-white/5 backdrop-blur-[40px] p-5 rounded-[24px] shadow-2xl border border-white/10 text-center cursor-pointer group transition-all duration-500 min-h-[160px] flex flex-col justify-center"
                     >
-                      <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+                      <div className="w-10 h-10 bg-indigo-600/20 text-indigo-400 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500 shadow-inner">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-2 block group-hover:text-indigo-200 transition-colors">{exam.applicable_level}</span>
-                      <h4 className="font-bold text-slate-900 group-hover:text-white transition-colors">{exam.name}</h4>
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-1 block group-hover:text-indigo-200 transition-colors">{exam.applicable_level}</span>
+                      <h4 className="font-black text-sm text-white group-hover:text-white transition-colors tracking-tight leading-tight px-2">{exam.name}</h4>
                     </motion.div>
                   ))}
                 </div>
@@ -313,18 +346,20 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                       {initialCourses.slice(0, 6).map((course, i) => (
                         <motion.div 
                           key={course.course_id}
-                          whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.08)" }}
-                          className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl transition-all duration-300 group/item"
+                          whileHover={{ scale: 1.03, backgroundColor: "rgba(255,255,255,0.08)" }}
+                          className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl transition-all duration-300 group/item flex flex-col justify-between min-h-[140px]"
                         >
-                           <p className="text-blue-400 text-[10px] mb-2 font-black uppercase tracking-[0.2em]">{course.level}</p>
-                           <h4 className="text-white font-bold text-lg mb-3 leading-tight">{course.course_name}</h4>
-                           <div className="flex items-center gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                           <div>
+                             <p className="text-blue-400 text-[9px] mb-1.5 font-black uppercase tracking-[0.15em]">{course.level}</p>
+                             <h4 className="text-white font-bold text-base mb-2 leading-snug line-clamp-2">{course.course_name}</h4>
+                           </div>
+                           <div className="flex items-center gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity mt-auto">
                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                             <span className="text-[10px] text-slate-400 font-bold uppercase">Popular Choice</span>
+                             <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Popular Choice</span>
                            </div>
                         </motion.div>
                       ))}
@@ -355,17 +390,17 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                     <h3 className="text-4xl lg:text-6xl font-black mb-6 tracking-tighter italic">Future Ready.</h3>
                     <p className="text-blue-200 text-lg opacity-80 mb-12 max-w-2xl mx-auto">Master the technologies and domains that are shaping the next decade. Your journey doesn't end at a degree—it starts there.</p>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div className="flex flex-wrap justify-center gap-3 lg:gap-4 max-w-4xl mx-auto">
                       {["Quantum Computing", "Deep Learning", "Fintech", "Cyber Law", "Robotics", "Bio-Tech", "ESG Investing"].map((spec, i) => (
                         <motion.span 
                           key={spec}
-                          whileHover={{ scale: 1.1, rotate: i % 2 === 0 ? 2 : -2 }}
-                          className="px-6 py-3 bg-white/15 rounded-2xl text-xs font-black backdrop-blur-3xl border border-white/20 shadow-xl"
+                          whileHover={{ scale: 1.05, y: -2 }}
+                          className="px-5 py-2.5 bg-white/10 rounded-xl text-[11px] font-black backdrop-blur-3xl border border-white/10 shadow-xl whitespace-nowrap"
                         >
                           {spec}
                         </motion.span>
                       ))}
-                      <span className="px-6 py-3 bg-blue-500/40 rounded-2xl text-xs font-black backdrop-blur-3xl border border-blue-400/40 shadow-xl flex items-center justify-center gap-2">
+                      <span className="px-5 py-2.5 bg-blue-500/30 rounded-xl text-[11px] font-black backdrop-blur-3xl border border-blue-400/20 shadow-xl flex items-center justify-center gap-2">
                         + Infinity
                       </span>
                     </div>
@@ -398,22 +433,33 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
 
       {/* RIGHT: CHATBOT AREA */}
       <div 
-        className={`w-full bg-white shadow-[-20px_0_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] transform ${
+        className={`w-full bg-white shadow-[-32px_0_64px_-24px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform ${
           isMobileChatOpen 
-            ? 'fixed inset-0 z-[110] flex flex-col translate-y-0 opacity-100 pointer-events-auto lg:relative lg:inset-auto lg:z-10 lg:flex-1' 
-            : 'fixed inset-0 z-[110] flex flex-col translate-y-[100%] opacity-0 pointer-events-none lg:pointer-events-auto lg:translate-y-0 lg:opacity-100 lg:flex lg:flex-1 lg:relative lg:inset-auto lg:z-10'
+            ? 'fixed inset-0 z-[110] flex flex-col translate-y-0 opacity-100 pointer-events-auto lg:relative lg:inset-auto lg:z-10 lg:flex-1 lg:flex-row' 
+            : 'fixed inset-0 z-[110] flex flex-col translate-y-[100%] opacity-0 pointer-events-none lg:pointer-events-auto lg:translate-y-0 lg:opacity-100 lg:flex lg:flex-1 lg:flex-row lg:relative lg:inset-auto lg:z-10'
         }`}
       >
         
-        {/* Desktop Sidebar (Always rendered on sm+) */}
-        <div className="hidden sm:flex w-[220px] shrink-0 border-r border-slate-100 flex-col bg-slate-50/50 z-10 relative">
-          {renderHistoryContent(false)}
-        </div>
+        {/* Desktop Sidebar */}
+        <AnimatePresence initial={false}>
+          {isSidebarVisible && (
+            <motion.div 
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 280, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              className="hidden lg:flex shrink-0 border-r border-white/5 flex-col bg-[#0a0f1d] z-10 relative overflow-hidden"
+            >
+              <div className="w-[280px] h-full flex flex-col">
+                {renderHistoryContent(false)}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Mobile Animated Drawer (Only rendered on small screens) */}
         <AnimatePresence>
           {isMobileHistoryOpen && (
-            <div className="fixed inset-0 z-[120] flex sm:hidden">
+            <div className="fixed inset-0 z-[120] flex lg:hidden">
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -463,24 +509,30 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                 </div>
               </div>
             </div>
-            
-            {/* Mobile Actions */}
-            <div className="flex items-center gap-2 lg:hidden">
+
+            {/* Desktop & Mobile Actions */}
+            <div className="flex items-center gap-2">
               <button 
-                onClick={() => setIsMobileHistoryOpen(true)}
-                className="p-2 rounded-xl text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm flex items-center justify-center"
-                title="View History"
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    setIsMobileHistoryOpen(true);
+                  } else {
+                    setIsSidebarVisible(!isSidebarVisible);
+                  }
+                }}
+                className="p-2.5 rounded-xl text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm flex items-center justify-center group"
+                title="Toggle History"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </button>
               <button 
                 onClick={() => { handleNewChat(); setIsMobileHistoryOpen(false); }}
-                className="p-2 rounded-xl text-blue-600 bg-blue-50 border border-blue-100/50 hover:bg-blue-100 transition-colors shadow-sm flex items-center justify-center"
+                className="p-2.5 rounded-xl text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm flex items-center justify-center group"
                 title="Start New Session"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
@@ -508,10 +560,10 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}
                   >
-                    <div className={`max-w-[90%] md:max-w-[80%] rounded-3xl shadow-sm ${
+                    <div className={`max-w-[85%] md:max-w-[80%] rounded-3xl shadow-sm ${
                       msg.role === 'user' 
-                        ? 'bg-linear-to-br from-blue-600 to-indigo-600 text-white rounded-br-sm font-medium p-4 text-[15px] shadow-blue-500/20 shadow-md' 
-                        : 'bg-white border border-slate-100/60 text-slate-800 rounded-bl-sm shadow-xl shadow-slate-200/20 backdrop-blur-xl'
+                        ? 'bg-linear-to-br from-blue-600 via-indigo-600 to-indigo-700 text-white rounded-br-sm font-semibold p-4 text-[15px] shadow-2xl shadow-indigo-500/40 border border-white/10' 
+                        : 'bg-white border border-slate-100 text-slate-800 rounded-bl-sm shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] backdrop-blur-3xl'
                     }`}>
                       {msg.role === 'model' ? (
                         <div className="flex flex-col">
@@ -585,7 +637,7 @@ export default function AdvisorClient({ initialExams, initialCourses, initialStr
                 <button 
                   type="submit"
                   disabled={!input.trim() || loading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-linear-to-br from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 text-white rounded-[14px] flex items-center justify-center transition-all shadow-lg shadow-blue-500/20 active:scale-95 group"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-linear-to-br from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-100 disabled:to-slate-100 disabled:text-slate-300 text-white rounded-[14px] flex items-center justify-center transition-all shadow-xl shadow-blue-500/20 active:scale-95 group border border-white/10"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-0.5 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />

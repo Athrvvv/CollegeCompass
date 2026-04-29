@@ -169,24 +169,37 @@ export async function getAdvisorResponse(message: string, chatId?: string) {
       ],
     });
 
-    const result = await chat.sendMessage(message);
-    const responseText = await result.response.text();
+    let retries = 2;
+    while (retries >= 0) {
+      try {
+        const result = await chat.sendMessage(message);
+        const responseText = await result.response.text();
 
-    // Persist if chatId is provided
-    if (chatId) {
-      await saveAdvisorMessage(chatId, "user", message);
-      await saveAdvisorMessage(chatId, "model", responseText);
+        // Persist if chatId is provided
+        if (chatId) {
+          await saveAdvisorMessage(chatId, "user", message);
+          await saveAdvisorMessage(chatId, "model", responseText);
 
-      // If it's the first message, update title
-      if (history.length === 0) {
-        const title = message.length > 30 ? message.substring(0, 27) + "..." : message;
-        await sql`UPDATE advisor_chats SET title = ${title} WHERE id = ${chatId}`;
+          // If it's the first message, update title
+          if (history.length === 0) {
+            const title = message.length > 30 ? message.substring(0, 27) + "..." : message;
+            await sql`UPDATE advisor_chats SET title = ${title} WHERE id = ${chatId}`;
+          }
+        }
+
+        return responseText;
+      } catch (error: any) {
+        if (error.message?.includes("503") && retries > 0) {
+          retries--;
+          await new Promise(res => setTimeout(res, 2000));
+          continue;
+        }
+        console.error("Gemini Advisor Error:", error);
+        throw new Error(error.message || "Failed to get response from AI Advisor");
       }
     }
-
-    return responseText;
   } catch (error: any) {
-    console.error("Gemini Advisor Error:", error);
-    throw new Error(error.message || "Failed to get response from AI Advisor");
+    console.error("Gemini Advisor Setup Error:", error);
+    throw new Error(error.message || "Failed to initialize AI Advisor");
   }
 }

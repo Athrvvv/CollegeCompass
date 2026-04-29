@@ -14,7 +14,13 @@ export async function POST(request: Request) {
       body: JSON.stringify(body),
     })
 
-    const data = await response.json()
+    const text = await response.text()
+    let data;
+    try {
+      data = JSON.parse(text)
+    } catch (e) {
+      data = { detail: [{ msg: text || "Invalid response from microservice" }] }
+    }
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status })

@@ -37,42 +37,75 @@ export async function GET(req: NextRequest) {
 
     // 3. Recommendation Logic (Scoring)
     const scoredColleges = colleges.map((college: any) => {
-      let score = 0;
+      let profileScore = 0;
+      let examScore = 0;
+      let qualityScore = 0;
       let reasons: string[] = [];
 
-      // A. Level Matching Logic
+      // A. Profile Match (Max 50%)
       const q = profile.education_qualification;
       const targetLevels: string[] = [];
       if (q === "10th Standard") targetLevels.push("Diploma", "12th Standard");
       if (q === "12th Standard" || q === "Diploma") targetLevels.push("Undergraduate (UG)");
       if (q === "Undergraduate (UG)") targetLevels.push("Postgraduate (PG)");
 
-      const levelMatch = college.course_levels.some((l: string) => targetLevels.includes(l));
+      // 1. Academic Level Match (25%)
+      const levelMatch = college.course_levels?.some((l: string) => targetLevels.includes(l));
       if (levelMatch) {
-        score += 50;
-        reasons.push(`Matches your ${q} background`);
+        profileScore += 25;
+        reasons.push(`${college.course_levels.join("/")} courses available`);
       }
 
-      // B. Exam Matching Logic
-      const userExams = profile.exams_appeared || [];
+      // 2. Geographic Match (15%)
+      if (college.state === profile.state_of_eligibility) {
+        profileScore += 15;
+        reasons.push(`In your preferred state (${profile.state_of_eligibility})`);
+      }
+
+      // 3. Institutional Type/Preference (10%)
+      if (college.typeofuni === "Public" || college.typeofuni === "Government") {
+        profileScore += 10;
+        reasons.push("Highly reputed public institution");
+      } else if (college.typeofuni === "Private" && profile.category === "General") {
+        profileScore += 5; // Slight boost for private if general category?
+      }
+
+      // B. Exam Match (Max 30%)
+      const userExams = Array.isArray(profile.exams_appeared) ? profile.exams_appeared : (typeof profile.exams_appeared === 'string' ? JSON.parse(profile.exams_appeared) : []);
       const userExamNames = userExams.map((e: any) => e.name);
-      const examMatch = college.accepted_exams.some((e: string) => userExamNames.includes(e));
-      if (examMatch) {
-        score += 30;
-        reasons.push("Accepts exams you've appeared for");
+      const matchingExams = college.accepted_exams?.filter((e: string) => userExamNames.includes(e)) || [];
+      
+      if (matchingExams.length > 0) {
+        // Linear scaling: if college accepts at least one of user's exams
+        examScore = 30;
+        reasons.push(`Accepts ${matchingExams.join(", ")}`);
       }
 
-      // C. Rating Logic
-      const avgRating = (Number(college.infra) + Number(college.academic) + Number(college.faculty) + Number(college.placement)) / 4 || Number(college.rating);
-      if (avgRating > 4) {
-        score += 20;
-        reasons.push("High student rating");
+      // C. Quality Score (Max 20%)
+      const infra = Number(college.infra) || 0;
+      const academic = Number(college.academic) || 0;
+      const faculty = Number(college.faculty) || 0;
+      const placement = Number(college.placement) || 0;
+      
+      const ratingSum = infra + academic + faculty + placement;
+      if (ratingSum > 0) {
+        // Scale sum (max 20 if all 5)
+        qualityScore = (ratingSum / 20) * 20;
+        if (placement > 4) reasons.push("Excellent placement record");
+        if (infra > 4) reasons.push("Modern infrastructure");
+      } else {
+        // Fallback to general rating
+        const genRating = Number(college.rating) || 0;
+        qualityScore = (genRating / 5) * 20;
+        if (genRating > 4) reasons.push("High student satisfaction");
       }
+
+      const totalScore = profileScore + examScore + qualityScore;
 
       return {
         ...college,
-        recommendationScore: score,
-        recommendationReasons: reasons
+        recommendationScore: Math.min(Math.round(totalScore), 100),
+        recommendationReasons: Array.from(new Set(reasons))
       };
     });
 
